@@ -95,6 +95,12 @@ public class WorkOrdersController : Controller
 
         if (workOrder == null) return NotFound();
 
+        if (workOrder.Assignments.Any())
+        {
+            TempData["ErrorMessage"] = $"Work Order {workOrder.WorkOrderNumber} has already been allocated to technician(s). Multi-assignment is restricted.";
+            return RedirectToAction(nameof(Index));
+        }
+
         if (workerUserIds == null || !workerUserIds.Any())
         {
             TempData["ErrorMessage"] = "Please select at least one maintenance technician.";
@@ -119,7 +125,7 @@ public class WorkOrdersController : Controller
                     RecipientUserId = workerId,
                     Title = $"New Task Assigned: {workOrder.WorkOrderNumber}",
                     Message = $"You have been assigned to maintenance ticket {workOrder.Complaint?.TicketNumber}: '{workOrder.Complaint?.Title}'.",
-                    TargetUrl = $"/Worker/Tasks/MyTasks",
+                    TargetUrl = $"/Worker/Dashboard/Index",
                     NotificationType = "Info",
                     CreatedAtUtc = DateTime.UtcNow
                 });
@@ -127,6 +133,10 @@ public class WorkOrdersController : Controller
         }
 
         workOrder.Status = WorkOrderStatus.Assigned;
+        if (workOrder.Complaint != null)
+        {
+            workOrder.Complaint.Status = ComplaintStatus.Assigned;
+        }
 
         // Log audit history
         _context.ComplaintHistories.Add(new ComplaintHistory

@@ -19,3 +19,7 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+## Local Scratch & Test Automation Scripts
+scratch/
+

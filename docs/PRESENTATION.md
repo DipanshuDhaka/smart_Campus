@@ -1,271 +1,294 @@
-# SmartCampus: Project Presentation Deck & Speaker Defense Script
+# SmartCampus: Project Presentation Deck & Academic Defense Script
 
 **Presentation Title:** SmartCampus: Intelligent Campus Issue Reporting, Workforce Allocation & Resolution Verification System  
-**Reference Institution:** Lovely Professional University (LPU), Punjab, India  
-**Target Audience:** University Leadership, Directorate of Facilities & IT Governance Committee  
+**Institution:** Lovely Professional University (LPU), Phagwara, Punjab, India  
+**Degree & Department:** B.Tech. in Computer Science & Engineering  
+**Academic Session:** 2025 – 2026  
 **Technology Stack:** ASP.NET Core MVC (.NET 10 LTS), EF Core 10, SQL Server, Bootstrap 5 (LPU UMS Theme)  
+**GitHub Repository:** [https://github.com/DipanshuDhaka/smart_Campus](https://github.com/DipanshuDhaka/smart_Campus)
 
 ---
 
-## Slide 1: Title & Project Identity
+### Project Personnel & Evaluation Metadata
+
+| Role | Details |
+| :--- | :--- |
+| **Submitted To (Project Evaluator):** | **Mr. Aryan Chauhan** (Teacher ID: 35200), Department of CSE, Lovely Professional University |
+| **Submitted By (Group Project):** | **Dipanshu** (Reg No: 12323250) — *Lead Architecture, EF Core & Backend*<br/>**Vishnu** (Reg No: 12307182) — *Control Desk Triage, SLA Engine & SignalR*<br/>**Harsh** (Reg No: 12306879) — *Spatial GIS, QR Automation & UI/UX* |
+
+---
+
+## Slide 1: Title & Academic Identity
 
 ```
-╔════════════════════════════════════════════════════════════════════════════════╗
-║                                 SMARTCAMPUS                                    ║
-║  Intelligent Campus Issue Reporting, Workforce Allocation & Resolution System  ║
-║                                                                                ║
-║                  Reference Campus: Lovely Professional University               ║
-║                        Enterprise .NET 10 LTS Architecture                      ║
-╚════════════════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════════════════════════╗
+║                             LOVELY PROFESSIONAL UNIVERSITY                             ║
+║                       Department of Computer Science & Engineering                     ║
+║                                                                                        ║
+║                                      SMARTCAMPUS                                       ║
+║         Intelligent Campus Issue Reporting, Workforce Allocation & Verification        ║
+║                                                                                        ║
+║   SUBMITTED BY:                                    SUBMITTED TO:                       ║
+║   • Dipanshu (12323250)                            Mr. Aryan Chauhan (ID: 35200)       ║
+║   • Vishnu   (12307182)                            Department of CSE, LPU              ║
+║   • Harsh    (12306879)                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════════════╝
 ```
 
 ### Speaker Notes
-> "Respected committee members, welcome to our presentation on **SmartCampus**. SmartCampus is an enterprise-grade campus maintenance and workforce governance platform engineered specifically for large-scale academic institutions, modeled around the reference campus of Lovely Professional University. Today, we will demonstrate how this system transforms campus facility management from a fragmented, manual process into an auditable, automated, and quality-verified digital workflow."
+> "Respected evaluator Aryan Chauhan sir, and members of the examination committee. Welcome to our capstone presentation on **SmartCampus**, presented by Dipanshu, Vishnu, and Harsh. SmartCampus is an enterprise-grade campus maintenance and workforce governance platform engineered specifically for large-scale academic institutions, modeled directly around Lovely Professional University. Today, we demonstrate how this system transforms campus facility management from informal, untracked channels into an auditable, automated, and quality-verified digital workflow."
 
 ---
 
-## Slide 2: The Institutional Challenge (The LPU Context)
+## Slide 2: Real Campus Motivation & Operational Problem Statement
 
-### Key Metrics
-- **Campus Scale:** 600+ contiguous acres in Phagwara, Punjab.
-- **Physical Plant:** 60+ multi-story academic blocks (Block 32, 34, 38), 14+ residential hostels (BH-1 to 8, GH-1 to 6), central library, UniMall, and outdoor utilities.
-- **Campus Population:** 30,000+ students and over 5,000 staff members.
+### 1. Campus Scale & Physical Plant
+- **600+ contiguous acres** in Phagwara, Punjab.
+- **60+ academic blocks** (Block 32 School of CSE, Block 34 Mechanical, Block 38 Electronics).
+- **14+ residential hostels** (BH-1 to BH-8, GH-1 to GH-6), Central Library, UniMall, and outdoor utility networks.
+- **30,000+ students and 5,000+ faculty and staff** generating dozens of daily breakdown requests across electrical, plumbing, civil, HVAC, and network domains.
 
-### The Operational Pain Points
-1. **Lost & Untracked Complaints:** Issues reported via WhatsApp, phone calls, or physical registers lack centralized tracking.
-2. **The "False Resolution" Trap:** Workers mark complaints as "fixed" without physical inspection, leading to recurring breakdowns.
-3. **Uneven Workforce Allocation:** Certain maintenance technicians are overloaded while others remain idle.
-4. **SLA Neglect:** Critical safety hazards (e.g., exposed wiring, water leakages in labs) linger without automated escalation.
+### 2. The Operational Breakdown
+1. **Informal & Lost Reporting:** WhatsApp groups, phone calls, and paper register entries lack audit history, unique ticket identifiers, and time-tracking.
+2. **The "False Resolution" Trap:** Technicians mark breakdown complaints as "completed" without physical on-site repair. Students discover the fixture is still defective.
+3. **Unequal Workforce Allocation:** Certain technicians are overwhelmed with 8+ tasks while others remain idle with 0 active work orders.
+4. **SLA Neglect:** High-risk safety hazards (e.g. electrical sparking in computing labs, burst pipes in hostels) linger without automated escalation deadlines.
 
-### Speaker Notes
-> "Operating an estate the size of LPU is equivalent to managing a small smart city. When a street lamp fails near Block 32 or an AC fails in a server lab, traditional reporting channels break down. The single largest issue faced by campus control desks is the 'False Resolution Trap'—where a technician marks an issue complete, but the student discovers it is still broken. SmartCampus was created to solve this fundamental accountability problem."
+### 3. The SmartCampus Solution
+- **10-Stage Auditable State Machine:** Tracks issues from student submission to verified supervisory closure.
+- **The Cardinal Principle:** *"Work Completed ≠ Verified Resolved"*. Mandatory independent supervisory inspection.
+- **Smart Recommender & Load Balancer:** Tokenizes problem descriptions, scores trade keywords, and distributes tasks to technicians with the lowest active workload.
+- **Automated SLA Engine:** 60-second background daemon triggers 50% reminders, 75% warnings, and 100% breach escalations.
 
 ---
 
-## Slide 3: Core Architectural Differentiator
+## Slide 3: System Architecture Paradigm & Technology Stack
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           THE CARDINAL PRINCIPLE                            │
-│                                                                             │
-│                   WORK COMPLETED  ≠  VERIFIED RESOLVED                      │
-│                                                                             │
-│   Worker finishes task ──► "Awaiting Verification" ──► Independent Head     │
-│                                                          inspects & signs off│
+│                           PRESENTATION LAYER                                │
+│   ASP.NET Core MVC 10 • Razor Views • Bootstrap 5 (LPU UMS Theme)           │
+│   Leaflet.js GIS Campus Map • Chart.js Operational Analytics                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                           APPLICATION SERVICES                              │
+│   Area Controllers: Admin, Supervisor, Worker, Reporter                     │
+│   Smart Recommender • Workload Auto-Balancer • QRCoder • FileStorage        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                        EVENT & REAL-TIME SERVICES                           │
+│   SLAEngineHostedService (60s loop) • SignalR NotificationHub (WebSockets)  │
+│   3-Tier Escalation Engine • Dual-Factor Quality Verification Gate          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                           DATA & PERSISTENCE                                │
+│   Microsoft SQL Server • EF Core 10 Code-First • ASP.NET Core Identity      │
+│   Google OAuth 2.0 Domain Whitelist • Fluent API Referential Integrity      │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Key Pillars
-- **Strict Role Separation:** A technician can **never** verify their own work.
-- **Evidence-Based Handover:** Mandatory side-by-side photographic inspection (Original Problem Photo vs Technician Completion Photo vs Supervisor Sign-off).
-- **Rework Loop:** Flawed repairs are formally rejected with defect notes and returned to the field technician.
+---
 
-### Speaker Notes
-> "Our core architectural breakthrough is simple yet transformative: In SmartCampus, 'Work Completed' does not mean 'Resolved'. When an electrician finishes a repair, the ticket enters 'Awaiting Verification'. An independent Department Supervisor must physically inspect the site, upload photographic proof, and formally sign off. If the work is substandard, it is rejected back to the technician for rework."
+## Slide 4: Unit 1 — Enterprise MVC Architecture & Area-Based Routing
+
+### Syllabus Topic: Model-View-Controller (MVC) Pattern & Request Pipeline
+- **Theoretical Foundation:** MVC decouples application logic into three distinct layers:
+  1. *Model:* Domain data structures and business validation rules.
+  2. *View:* Presentation rendering and dynamic UI display via Razor (`.cshtml`).
+  3. *Controller:* HTTP request processing, action filter execution, and model-view coordination.
+- **Area Partitioning:** ASP.NET Core Areas logically isolate large enterprise applications into modular sub-applications, each containing its own controllers, views, and routing tables.
+
+### Practical Use Case in SmartCampus
+- **4 Discrete Functional Areas:**
+  - `Admin`: Central Control Desk, complaint triage, building spatial manager, operations analytics.
+  - `Supervisor`: Trade department dispatch, technician roster allocation, verification quality gate.
+  - `Worker`: Mobile field task portal, task acknowledgement, before/after evidence upload.
+  - `Reporter`: Student/staff complaint creation, tracking timeline, feedback ratings.
+- **Unified Master Layout:** All areas inherit from `_Layout.cshtml`, styled in the authentic LPU UMS visual aesthetic (navy `#0F2B48` and ochre gold `#D48A14`).
+- **Code Artifact:** `src/SmartCampus.Web/Areas/Worker/Controllers/DashboardController.cs` annotated with `[Area("Worker")]` and `[Authorize(Roles = "MaintenanceWorker")]`.
 
 ---
 
-## Slide 4: Authentic LPU UMS Portal Aesthetic
+## Slide 5: Unit 2 — Relational Data Modeling & EF Core Code-First ORM
 
-### Design Standards
-- **Zero "AI-Template" Clutter:** No purple gradients, floating neon bubbles, or generic SaaS marketing elements.
-- **LPU UMS Color Palette:** Classic deep navy blue (`#0f2b48` / `#1B365D`), crisp university white (`#ffffff`), and slate gray structured borders (`#e2e8f0`).
-- **Institutional Context:**
-  - University crest and formal portal header.
-  - Institutional profile badge displaying Full Name, Role, and Student/Staff Registration Number.
-  - High-density, readable tabular records with crisp Bootstrap 5 status badges.
-  - Breadcrumb navigation ribbons ensuring clear operational context.
+### Syllabus Topic: Code-First ORM, Fluent API & Relational Constraints
+- **Theoretical Foundation:** Object-Relational Mapping (ORM) maps strongly typed C# classes to relational database tables, eliminating raw string SQL vulnerabilities and data type mismatches.
+- **Fluent API Configuration:** `OnModelCreating` configures composite primary keys, table relationships, foreign key constraints, and indexing pipelines.
+- **Referential Integrity & Cascading:** Setting `DeleteBehavior.Restrict` prevents accidental cascading deletes of dependent child records when parent rows are modified.
 
-### Speaker Notes
-> "We intentionally rejected generic or AI-styled templates. Instead, we designed SmartCampus to seamlessly reflect the formal, authoritative look and feel of LPU UMS. From the navy blue top bar to the registration number badges and structured tables, any student, professor, or maintenance supervisor will feel instantly at home."
-
----
-
-## Slide 5: The 5-Tier Role Governance Matrix
-
-| Role | Operational Scope | Key Functionality |
-| :--- | :--- | :--- |
-| **1. Student / Teacher** | Personal Submissions | File issue with photos, track timeline, rate service |
-| **2. Campus Control Desk** | Campus-Wide Queue | Triage tickets, detect duplicates, assign priority & SLA |
-| **3. Department Supervisor** | Department Scope | Allocate workers, inspect completed jobs, approve/reject |
-| **4. Maintenance Worker** | Assigned Tasks Only | Accept assignments, update progress, upload after-photos |
-| **5. Super Administrator** | Global Governance | Dynamic buildings, SLA policies, user approvals, analytics |
-
-### Speaker Notes
-> "Security and governance are maintained through five tightly scoped roles. Self-registration grants only the Student/Teacher role. Elevating accounts to technicians, supervisors, or administrators requires explicit administrative authorization. Strict data boundaries ensure workers see only their own tasks, while supervisors oversee their trade departments."
+### Practical Use Case in SmartCampus: 3-Tier Spatial Topology
+- **Hierarchical Spatial Modeling:** `Building (1) -> Floor (N) -> Location (N)`. A room cannot exist without an assigned floor, and a floor cannot exist without a parent building.
+- **Live Database Verification:** Populated with newly inserted campus assets:
+  - Block 32: 2nd Floor (Robotics & IoT Wing) -> Room 32-201 (Robotics & Embedded Systems Lab).
+  - Block 34: 1st Floor (Mechatronics & Structural Wing) -> Room 34-101 (Advanced Hydraulics Lab).
+  - BH-01: 1st Floor (East Wing) -> Room BH1-101 (Resident Room 101).
+- **11 Relational Modules (33 Tables):** Covering complaints, work orders, assignments, verifications, SLA policies, and audit histories.
+- **Code Artifact:** `src/SmartCampus.Web/Data/ApplicationDbContext.cs`, using Fluent API to configure `LocationGuid` unique index and restrict cascade deletion.
 
 ---
 
-## Slide 6: Google OAuth 2.0 & Institutional Whitelist
+## Slide 6: Unit 3 — Identity Management, OAuth 2.0 & Role Security
+
+### Syllabus Topic: Claims-Based Authorization & OAuth 2.0 Whitelisting
+- **Theoretical Foundation:** Authentication verifies user identity, while Authorization governs role-based privileges. OAuth 2.0 enables secure token delegation with trusted identity providers.
+- **Anti-CSRF Protection:** Cryptographic anti-forgery tokens validate all state-mutating HTTP POST requests.
+- **Defense-in-Depth:** Combining middleware authentication, declarative role attributes, and server-side claim verification.
+
+### Practical Use Case in SmartCampus: 5-Tier RBAC & Single Allocation
+- **Google SSO with Institutional Whitelist:** Permitted email domains (`@lpu.co.in`, `@lpu.in`) are stored in `AllowedEmailDomains` table, preventing unauthorized external access.
+- **5-Tier Governance Matrix:**
+  1. `StudentTeacher`: Report issues, view personal history, rate service.
+  2. `CampusAdmin`: Campus Control Desk triage, duplicate detection, priority assignment.
+  3. `DepartmentSupervisor`: Dispatch work orders, manage squads, inspect and verify repairs.
+  4. `MaintenanceWorker`: Mobile field execution, accept/start tasks, upload completion proof.
+  5. `SuperAdmin`: Global user management, domain authorization, SLA policy governance.
+- **Single-Allocation Constraint:** Enforces that a work order can only be assigned once. Multi-assignment is locked with an atomic check `workOrder.Assignments.Any()`.
+- **Code Artifact:** `AccountController.cs` domain validation, `WorkOrdersController.cs` single-allocation check.
+
+---
+
+## Slide 7: Unit 4 — Background Hosted Services & Real-Time SignalR
+
+### Syllabus Topic: ASP.NET Core BackgroundService & WebSockets
+- **Theoretical Foundation:** Asynchronous recurring background processes run outside HTTP request threads via `IHostedService` / `BackgroundService`. SignalR provides full-duplex WebSocket channels for instant server-to-client push updates.
+- **Graceful Execution Loop:** `ExecuteAsync` handles continuous background execution with `CancellationToken` support.
+
+### Practical Use Case in SmartCampus: Automated SLA Escalation Engine
+- **Continuous 60-Second Scan:** `SLAEngineHostedService` runs as a managed daemon in the ASP.NET Core process, inspecting active tickets against configured `SLAPolicies`.
+- **3-Tier Escalation Thresholds:**
+  - *50% Elapsed:* Tier 1 Reminder to Assigned Maintenance Technician.
+  - *75% Elapsed:* Tier 2 Warning to Department Supervisor.
+  - *100% Elapsed:* Tier 3 Breach Escalation to Campus Control Desk & SuperAdmin.
+- **SignalR Live Push:** Dispatches toast alerts over `/hubs/notifications` to active browser clients without polling.
+- **Code Artifact:** `src/SmartCampus.Web/Services/SLAEngineHostedService.cs` and `NotificationHub.cs`.
+
+---
+
+## Slide 8: Unit 5 — Geospatial GIS Mapping & Vector QR Code Automation
+
+### Syllabus Topic: Spatial Mapping & Matrix Barcode Encoding
+- **Theoretical Foundation:** Translating WGS84 geographic coordinate pairs into interactive map layers, and encoding structured URLs into 2D matrix bit patterns using Reed-Solomon algebraic error correction algorithms.
+- **Asynchronous RESTful APIs:** Client-side AJAX consuming lightweight JSON endpoints for dynamic UI cascading.
+
+### Practical Use Case in SmartCampus: LPU GIS Map & Room Doorplates
+- **Interactive LPU Campus GIS Map:** Leaflet.js map initialized at LPU campus coordinates (`31.2536° N, 75.7037° E`), plotting 60+ buildings with live incident hotspot markers.
+- **Algorithmic Room Doorplates:** Every room generates a unique SVG/PNG QR doorplate using QRCoder. Scanning with a smartphone instantly pre-fills Building, Floor, and Room.
+- **AJAX Cascading Dropdowns:** Selecting 'Block 32' fetches floors via `/api/LocationApi/floors/1`, and selecting '2nd Floor' fetches rooms via `/api/LocationApi/locations/2002`.
+- **Code Artifact:** `LocationApiController.cs`, `CampusMap.cshtml`, `QRCodeService.cs`.
+
+---
+
+## Slide 9: Unit 6 — Software Verification Gates & Quality Engineering
+
+### Syllabus Topic: Quality Assurance & Independent Verification Gates
+- **Theoretical Foundation:** Separation of Duties dictates that executors must not verify their own work. Quality engineering requires an auditable handover gate where an independent supervisor validates physical evidence before closure.
+- **Operational Reliability Metrics:** Mean Time to Resolution (MTTR), SLA compliance percentages, and failure hotspot densities.
+
+### The Cardinal Principle: "Work Completed ≠ Verified Resolved"
+- **Mandatory Quality Gate:** When a technician completes work, the ticket transitions to `AwaitingVerification`. It CANNOT be closed by the worker.
+- **Physical Supervisory Audit:** The Department Supervisor physically visits the site, verifies before/after photos, enters qualitative remarks, and assigns a 1-5 star quality rating.
+- **Substandard Repair Rework Loop:** If a repair is substandard, the supervisor formally rejects the handover, transitioning the ticket to `ReworkRequired` back to the field technician.
+- **Code Artifact:** `VerificationController.cs` (Approve/Reject actions), `Verifications` relational table logging signed inspections.
+
+---
+
+## Slide 10: Live Workflow Demo — Steps 1 & 2 (Reporting & Triage)
 
 ```
-[User clicks "Continue with Google"]
-               │
-               ▼
-   [Server validates ID Token & email_verified == true]
-               │
-               ▼
-   [Server checks domain against AllowedEmailDomains table]
-     ├── Domain NOT whitelisted ──► Terminate with warning
-     └── Domain permitted (@lpu.co.in / @lpu.in)
-               │
-               ▼
-   [Establish ASP.NET Identity Session ──► Role Dashboard]
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Student Issue Filing (Student: student.test@lpu.in)                 │
+│ • Location: Block 32 -> 2nd Floor (Robotics Wing) -> Room 32-201            │
+│ • Category: Electrical & Lighting                                           │
+│ • Description: Short circuit & MCB sparking near workbench 3                │
+│ • Result: Generates Ticket SC-2026-00005 (Status: Submitted)               │
+│ • Evidence: docs/screenshots/wf_02_complaint_form_filled.png                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ STEP 2: Control Desk Triage (Officer Harpreet Singh)                        │
+│ • Duplicate Detection: Scans past 48 hours for identical room/category      │
+│ • Smart Recommender: Matches #sparking, #mcb -> Electrical Dept             │
+│ • Priority: Critical (SLA: 1 Hour)                                          │
+│ • Result: Dispatches Work Order WO-2026-00004                               │
+│ • Evidence: docs/screenshots/wf_04_triage_review_page.png                  │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Speaker Notes
-> "SmartCampus eliminates insecure password storage by leveraging Google OAuth 2.0 Single Sign-On. Crucially, the backend verifies tokens on the server and checks the email against our dynamic `AllowedEmailDomains` table. This allows university administrators to restrict access to `@lpu.co.in` or `@lpu.in` domains, while permitting configurable test domains during pilot stages."
-
 ---
 
-## Slide 7: Dynamic Spatial Hierarchy & Dynamic QR Codes
+## Slide 11: Live Workflow Demo — Steps 3 & 4 (Allocation & Execution)
 
 ```
-LPU Campus (600 Acres)
-    ├── Academic Blocks (Block 32, 34, 38...)
-    │       └── Floors (Basement, Ground, 1st..8th)
-    │               └── Rooms (Classroom 32-401, AI Lab 3, Restrooms) ──► QR Code
-    ├── Residential Hostels (BH-1..8, GH-1..6)
-    └── Outdoor Sectors (Perimeter Roads, Green Zones, Parking) ──► Pole QR Code
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Supervisor Allocation (Er. Manjit Kumar - Electrical Head)          │
+│ • Workload Auto-Balancing: Ranks technicians by lowest active task count    │
+│ • Allocates Senior Electrician Rajesh Verma                                 │
+│ • Single-Allocation Lock: Prevents duplicate allocations                    │
+│ • Evidence: docs/screenshots/wf_07_supervisor_allocate_page.png             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ STEP 4: Technician Execution (Senior Electrician Rajesh Verma)              │
+│ • Electrician accepts task -> Status: WorkAccepted                          │
+│ • Starts on-site work -> Status: InProgress                                 │
+│ • Replaces 32A Schneider MCB, balances circuit, tests 230V stable load      │
+│ • Uploads after-repair photographic evidence & repair notes                 │
+│ • Handover: Transitions to 'AwaitingVerification' (Cannot self-close)       │
+│ • Evidence: docs/screenshots/wf_11_electrician_complete_form.png            │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Key Technical Feature
-- **Zero Hardcoded Buildings:** All buildings, floors, and rooms are database-driven, allowing portability to any other campus.
-- **Dynamic QR Code Engine:** Uses `QRCoder` to encode unique location GUIDs. A student scanning a doorplate QR code is taken directly to an auto-filled report form.
-
-### Speaker Notes
-> "With over 60 buildings, hardcoding campus geography is impossible. SmartCampus models the campus as a 3-tier dynamic tree: Building to Floor to Room or Outdoor Zone. Furthermore, every room or utility pole has a unique cryptographic QR code. Scanning the QR code instantly locks in the building and room, eliminating user reporting errors."
-
 ---
 
-## Slide 8: The 10-Stage Complaint Lifecycle
+## Slide 12: Live Workflow Demo — Step 5 (Verification Gate & Closure)
 
 ```
-1. Submitted ────────► 2. Under Review ────────► 3. Approved / Rejected
-                            │
-                            ▼
-                    4. Assigned (WorkOrder & SLA)
-                            │
-                            ▼
-                    5. Work Accepted
-                            │
-                            ▼
-                    6. In Progress
-                            │
-                            ▼
-                    7. Work Completed (Photos Uploaded)
-                            │
-                            ▼
-                8. Awaiting Verification
-                   ├── Supervisor Approves ──► 9a. Verified Resolved ──► 10. Closed
-                   └── Supervisor Rejects  ──► 9b. Rework Required ──► Back to In Progress
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5A: Supervisor Quality Inspection (Er. Manjit Kumar)                   │
+│ • Supervisor physically inspects Room 32-201 on site                        │
+│ • Reviews before/after photos and conducts thermal scan (34°C normal)       │
+│ • Awards 5-star quality rating and submits formal sign-off remarks          │
+│ • Result: Approves ticket -> Transitions to 'VerifiedResolved'              │
+│ • Evidence: docs/screenshots/wf_14_verification_inspect_gate.png            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ STEP 5B: Student Final Verified Resolution (student.test@lpu.in)            │
+│ • Student views updated ticket with completed 10-stage timeline             │
+│ • Verified resolved within 1-hour SLA target                                │
+│ • Complete audit history preserved in database                              │
+│ • Evidence: docs/screenshots/wf_16_student_verified_resolved_final.png      │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Speaker Notes
-> "Here you see the complete 10-stage lifecycle. Notice that after Stage 7 (Work Completed), the ticket does not close. Instead, it enters Stage 8: Awaiting Verification. Only when the Department Supervisor conducts a physical inspection and approves it does it reach Verified Resolved. If rejected, it enters the Rework Required loop with defect notes."
+---
+
+## Slide 13: Key Engineering Challenges & Technical Solutions
+
+| # | Challenge Encountered | Technical Root Cause | Engineering Solution Implemented |
+| :--- | :--- | :--- | :--- |
+| **1** | Multi-Assignment Bug | Supervisor could click "Allocate Squad" repeatedly | Enforced `workOrder.Assignments.Any()` check in controller and replaced button with "Squad Allocated" badge |
+| **2** | Technician Dashboard Usability | Worker dashboard had disabled action buttons | Refactored `Dashboard/Index.cshtml` to dynamically render direct action forms (Accept, Start, Submit Evidence) |
+| **3** | Spatial Dropdown Performance | Rendering 60+ blocks and 1000+ rooms bloated DOM | Built asynchronous RESTful `LocationApi` with dynamic cascading fetch pipelines on demand |
+| **4** | Self-Verification Fraud Risk | Technicians attempting to approve their own tasks | Enforced server-side claim assertion `WorkerUserId != CurrentUserId` in `VerificationController.cs` |
 
 ---
 
-## Slide 9: Workforce Allocation & Workload Balancing
+## Slide 14: Student Team Contributions & Academic Outcomes
 
-### Intelligent Allocation Features
-- **Trade Matching:** Complaint category (Electrical, Plumbing, HVAC, Civil, IT) automatically filters the target department.
-- **Multi-Trade Work Orders:** Complex incidents automatically spawn child work orders across multiple departments.
-- **Real-Time Workload Meters:**
-  - `Available` (0–1 active tasks) — Green
-  - `Busy` (2–3 active tasks) — Yellow
-  - `Overloaded` (>3 active tasks) — Red
-  - `On Leave` — Muted
+### 1. Dipanshu (Registration Number: 12323250)
+- **Role:** Lead Architecture & Backend Engineering
+- **Contributions:** Architected ASP.NET Core MVC solution across 4 Areas; designed 11 relational modules with EF Core 10 Fluent API; configured Google OAuth 2.0 whitelist; enforced single-allocation constraint and ACID transactions.
 
-### Speaker Notes
-> "Supervisors no longer assign work blindly. When an approved ticket arrives, the system displays the technician roster with their verified skills and live workload meters. This prevents overloading senior technicians while junior workers sit idle, optimizing campus response times."
+### 2. Vishnu (Registration Number: 12307182)
+- **Role:** Control Desk Triage & SLA Real-Time Engine
+- **Contributions:** Implemented Control Desk triage queue with 48-hour duplicate detection; developed `SLAEngineHostedService` 60-second background daemon; built SignalR notification hub and operations analytics dashboards.
 
----
-
-## Slide 10: Multi-Tier SLA & Automated Escalation Engine
-
-| Priority | Target Resolution | Tier 1 (50% Elapsed) | Tier 2 (75% Elapsed) | Tier 3 (100% Breached) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Critical** | 1 Hour | 30 min Technician Reminder | 45 min Supervisor Warning | 60 min Admin Escalation |
-| **High** | 6 Hours | 3 hour Reminder | 4.5 hour Warning | 6 hour Escalation |
-| **Medium** | 24 Hours | 12 hour Reminder | 18 hour Warning | 24 hour Escalation |
-| **Low** | 72 Hours | 36 hour Reminder | 54 hour Warning | 72 hour Escalation |
-
-### Engine Mechanics
-- Autonomous background service (`SLAEngineHostedService`) checks active tickets every 60 seconds.
-- Automatically sets `IsOverdue = true` and logs auditable breach records in `SLAEscalations`.
-
-### Speaker Notes
-> "To guarantee that maintenance requests are never forgotten, SmartCampus incorporates an automated SLA engine. Running as a continuous background service, it calculates elapsed time against resolution targets. At 50%, the worker is reminded; at 75%, the supervisor receives a warning; at 100%, the ticket breaches, alerting the central campus control desk."
+### 3. Harsh (Registration Number: 12306879)
+- **Role:** Spatial GIS, QR Automation & UI/UX Design
+- **Contributions:** Implemented Leaflet.js interactive GIS map for 60+ LPU campus blocks; built QRCoder dynamic vector QR doorplate engine; designed authentic LPU UMS visual aesthetic with Bootstrap 5; engineered mobile technician task flow.
 
 ---
 
-## Slide 11: Enterprise Database Architecture (`SmartCampusDB`)
+## Slide 15: Conclusion, GitHub Repository & Defense Q&A
 
-### 11 Relational Modules
-1. **Identity & Auth:** `AspNetUsers`, `UserProfiles`, `AllowedEmailDomains`
-2. **Campus Topology:** `Buildings`, `Floors`, `Locations`
-3. **Issue Catalog & SLA:** `IssueCategories`, `Priorities`, `SLAPolicies`
-4. **Workforce Structure:** `Departments`, `Teams`, `TeamMembers`, `Skills`
-5. **Complaints:** `Complaints`, `ComplaintImages`
-6. **Work Orders:** `WorkOrders`, `WorkOrderAssignments`, `WorkOrderEvidence`
-7. **Verification Gate:** `Verifications`, `VerificationImages`
-8. **SLA Monitoring:** `SLAEscalations`
-9. **Feedback & Quality:** `ComplaintFeedbacks`
-10. **System Notifications:** `Notifications`
-11. **System Audit Trail:** `ComplaintHistory`, `AuditLogs`
+### Summary of Engineering Accomplishments
+- **Production-Ready Platform:** All 15 development phases complete and verified with 0 compilation errors across .NET 10 LTS.
+- **Cardinal Verification Gate:** "Work Completed ≠ Verified Resolved" eliminates the False Resolution Trap.
+- **Live Database Grounding:** Verified with 60+ buildings, floors, rooms, and complete lifecycle tickets.
+- **Automated Governance:** 60-second SLA daemon, workload auto-balancer, and real-time SignalR alerts.
+- **GitHub Repository:** [https://github.com/DipanshuDhaka/smart_Campus](https://github.com/DipanshuDhaka/smart_Campus) (All 187 files synchronized).
 
-### Speaker Notes
-> "Our database architecture in SQL Server is partitioned into 11 distinct relational modules. Every status change, worker assignment, and verification inspection is backed by immutable audit history and composite database indexes, ensuring sub-50ms performance even under heavy university concurrency."
-
----
-
-## Slide 12: GIS Mapping & Operational Analytics
-
-### Geospatial Visualization (Leaflet.js)
-- Interactive campus map centered on LPU coordinates (`31.2536° N, 75.7037° E`).
-- Color-coded urgency pins (Red = Critical, Orange = High, Yellow = Medium, Green = Resolved).
-- Building-level issue aggregation and hotspot heatmaps.
-
-### Executive Dashboards (Chart.js)
-- Mean Time to Resolve (MTTR) trends.
-- Department-wise SLA compliance percentages.
-- Verification rejection/rework rates per trade team.
-
-### Speaker Notes
-> "Campus leadership requires high-level operational intelligence. Our Leaflet map provides an instant spatial overview of where faults are clustered across LPU's 600 acres. Simultaneously, our executive Chart.js dashboards monitor department response velocity, SLA compliance rates, and technician performance."
-
----
-
-## Slide 13: Staged Campus Deployment Strategy
-
-```
-Stage 1: Prototype (Weeks 1–4)
-  ├── 3–5 Core Buildings (e.g. Block 32, Block 34, Central Library)
-  └── Test 5 roles, work orders & independent verification gate
-
-Stage 2: Limited Campus Pilot (Weeks 5–8)
-  ├── 10–15 Blocks (Academic Blocks + BH-1, GH-1 Hostels)
-  └── Real student reporting, live maintenance dispatch & feedback
-
-Stage 3: Full University Rollout (Weeks 9–12)
-  ├── 60+ Blocks across all 600 acres
-  └── Full integration with LPU estate management divisions
-```
-
-### Speaker Notes
-> "We advocate a disciplined, phased rollout. We begin with a focused 3-to-5 building prototype covering Block 32 and Central Library, advance to a 15-building pilot including hostels, and finally transition to a campus-wide rollout across all 60+ blocks."
-
----
-
-## Slide 14: Conclusion & Project Summary
-
-### Summary of Accomplishments
-- Delivered an enterprise-grade ASP.NET Core MVC (.NET 10 LTS) platform.
-- Implemented the authentic **LPU UMS** institutional design language.
-- Enforced the **Independent Verification Gate** (`Work Completed != Resolved`).
-- Automated workforce allocation, SLA tracking, and dynamic QR location mapping.
-- Supported by complete documentation: SRS, Use Cases, ERD, Report, and Build Logs.
-
-### Speaker Notes
-> "In conclusion, SmartCampus bridges the gap between infrastructure maintenance and accountability. By replacing informal, unverifiable reporting with an intelligent, role-governed platform, SmartCampus ensures that Lovely Professional University operates with the highest standards of safety, transparency, and operational excellence. Thank you, and we welcome your questions."
+### Defense Closing Statement
+> "Respected evaluator Aryan Chauhan sir, and members of the examination committee: SmartCampus demonstrates how academic software engineering principles—MVC design patterns, relational normalization, claims-based security, asynchronous hosted services, and independent verification gates—converge into a robust enterprise solution for Lovely Professional University. We thank you for your mentorship and are now open for technical questions."

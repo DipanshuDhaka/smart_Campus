@@ -130,9 +130,21 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-ums-primary py-2">
-                            <i class="bi bi-check2-circle me-1"></i> Confirm Technician Allocation & Dispatch
-                        </button>
+                        @if (currentlyAssigned.Any())
+                        {
+                            <div class="alert alert-warning py-2 small mb-2 text-center">
+                                <i class="bi bi-info-circle me-1"></i> This work order has already been allocated to a technician. Re-assignment is restricted.
+                            </div>
+                            <button type="submit" class="btn btn-secondary py-2" disabled>
+                                <i class="bi bi-lock-fill me-1"></i> Already Allocated (Single Assignment Only)
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-ums-primary py-2">
+                                <i class="bi bi-check2-circle me-1"></i> Confirm Technician Allocation & Dispatch
+                            </button>
+                        }
                     </div>
                 </form>
             </div>

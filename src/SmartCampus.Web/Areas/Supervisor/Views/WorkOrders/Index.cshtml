@@ -88,9 +88,18 @@
                                     <span class="badge bg-secondary">@wo.Status</span>
                                 </td>
                                 <td>
-                                    <a asp-action="Assign" asp-route-id="@wo.WorkOrderId" class="btn btn-sm btn-ums-primary">
-                                        <i class="bi bi-person-gear me-1"></i> Allocate Squad
-                                    </a>
+                                    @if (wo.Assignments != null && wo.Assignments.Any())
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                                            <i class="bi bi-check2-circle me-1"></i> Squad Allocated
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Assign" asp-route-id="@wo.WorkOrderId" class="btn btn-sm btn-ums-primary">
+                                            <i class="bi bi-person-gear me-1"></i> Allocate Squad
+                                        </a>
+                                    }
                                 </td>
                             </tr>
                         }
