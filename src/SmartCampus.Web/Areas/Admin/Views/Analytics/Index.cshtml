@@ -1,0 +1,316 @@
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Campus Operations Analytics & SLA Metrics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Breadcrumb & Page Header -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb ums-breadcrumb mb-2">
+            <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Control Desk</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Operations Analytics</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="bi bi-graph-up text-primary me-2"></i>Campus Operations Analytics & SLA Metrics
+            </h3>
+            <p class="text-muted small mb-0">
+                Real-time facilities performance, resolution velocity, department workload distribution, and high-frequency problem hotspots across LPU campus.
+            </p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <span class="badge bg-light text-dark border p-2 d-flex align-items-center">
+                <i class="bi bi-circle-fill text-success me-1" style="font-size: 0.6rem;"></i> Live System Stream
+            </span>
+            <button class="btn btn-outline-primary btn-sm" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print Institutional Report
+            </button>
+            <a asp-area="Admin" asp-controller="SLAMonitor" asp-action="Index" class="btn btn-ums btn-sm">
+                <i class="bi bi-stopwatch me-1"></i> Active SLA Monitor
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. Executive Metric Tiles -->
+    <div class="row g-3 mb-4">
+        <!-- Total Complaints -->
+        <div class="col-sm-6 col-xl">
+            <div class="ums-stat-card border-left-navy h-100">
+                <div class="ums-stat-title">Total Logged</div>
+                <div class="ums-stat-value text-dark">@ViewBag.TotalComplaints</div>
+                <div class="ums-stat-desc text-muted"><i class="bi bi-ticket-detailed me-1"></i>Campus cumulative issues</div>
+            </div>
+        </div>
+
+        <!-- Resolved Complaints -->
+        <div class="col-sm-6 col-xl">
+            <div class="ums-stat-card border-left-green h-100">
+                <div class="ums-stat-title">Verified Resolved</div>
+                <div class="ums-stat-value text-success">@ViewBag.ResolvedComplaints</div>
+                <div class="ums-stat-desc text-success">
+                    <i class="bi bi-check-all me-1"></i>100% supervisor verified
+                </div>
+            </div>
+        </div>
+
+        <!-- SLA Compliance Rate -->
+        <div class="col-sm-6 col-xl">
+            <div class="ums-stat-card border-left-blue h-100">
+                <div class="ums-stat-title">SLA Compliance</div>
+                <div class="ums-stat-value text-primary">@ViewBag.ComplianceRate%</div>
+                <div class="ums-stat-desc text-muted"><i class="bi bi-shield-check me-1"></i>Resolved within policy</div>
+            </div>
+        </div>
+
+        <!-- Mean Time To Resolve -->
+        <div class="col-sm-6 col-xl">
+            <div class="ums-stat-card border-left-orange h-100">
+                <div class="ums-stat-title">Mean Time to Resolve</div>
+                <div class="ums-stat-value text-warning">@ViewBag.AverageMttrHours <span style="font-size: 1rem;">hrs</span></div>
+                <div class="ums-stat-desc text-muted"><i class="bi bi-speedometer2 me-1"></i>Average turnaround velocity</div>
+            </div>
+        </div>
+
+        <!-- User Satisfaction -->
+        <div class="col-sm-6 col-xl">
+            <div class="ums-stat-card border-left-gold h-100">
+                <div class="ums-stat-title">Campus Satisfaction</div>
+                <div class="ums-stat-value text-warning">@ViewBag.AverageRating <span style="font-size: 1rem;">/ 5.0</span></div>
+                <div class="ums-stat-desc text-warning"><i class="bi bi-star-fill me-1"></i>Student & staff ratings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Charts Row 1: Category Doughnut + Department Workload Bar -->
+    <div class="row g-4 mb-4">
+        <!-- Maintenance Category Distribution -->
+        <div class="col-lg-5">
+            <div class="card ums-card shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-pie-chart-fill text-primary me-2"></i>Complaints by Category
+                    </h6>
+                    <span class="badge bg-light text-muted border">Distribution</span>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 320px;">
+                    <div style="width: 100%; max-width: 320px; position: relative;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Workload & Clearance Efficiency -->
+        <div class="col-lg-7">
+            <div class="card ums-card shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-bar-chart-fill text-success me-2"></i>Department Workload & Resolution Efficiency
+                    </h6>
+                    <span class="badge bg-light text-muted border">Total vs Verified</span>
+                </div>
+                <div class="card-body" style="min-height: 320px;">
+                    <canvas id="departmentChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Charts Row 2: Campus Hotspots + Governance Summary -->
+    <div class="row g-4">
+        <!-- Top 5 Problem Hotspots -->
+        <div class="col-lg-6">
+            <div class="card ums-card shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-building-exclamation text-danger me-2"></i>Campus Hotspot Matrix (Top 5 Buildings)
+                    </h6>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">High Maintenance Load</span>
+                </div>
+                <div class="card-body" style="min-height: 280px;">
+                    <canvas id="hotspotChart" style="max-height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Institutional Quality & Governance Summary -->
+        <div class="col-lg-6">
+            <div class="card ums-card shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-shield-check text-primary me-2"></i>Institutional Governance & SLA Framework
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="p-3 bg-light rounded border mb-3">
+                        <div class="fw-bold text-dark small mb-1">INDEPENDENT VERIFICATION MANDATE</div>
+                        <p class="text-muted small mb-0">
+                            Strict compliance with standard: <strong>Work Completed &ne; Resolved</strong>.
+                            Technicians cannot self-approve work orders. Every resolved ticket has physical photographic evidence verified and digitally signed off by an authorized Department Supervisor.
+                        </p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Priority Tier</th>
+                                    <th>Standard Target</th>
+                                    <th>50% Reminder</th>
+                                    <th>75% Warning</th>
+                                    <th>100% Escalation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge bg-danger">Critical</span></td>
+                                    <td>1 hour</td>
+                                    <td>Worker ping</td>
+                                    <td>Supervisor ping</td>
+                                    <td>Control Desk alert</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-warning text-dark">High</span></td>
+                                    <td>6 hours</td>
+                                    <td>Worker ping</td>
+                                    <td>Supervisor ping</td>
+                                    <td>Control Desk alert</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-info text-dark">Medium</span></td>
+                                    <td>24 hours</td>
+                                    <td>Worker ping</td>
+                                    <td>Supervisor ping</td>
+                                    <td>Control Desk alert</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-secondary">Low</span></td>
+                                    <td>72 hours</td>
+                                    <td>Worker ping</td>
+                                    <td>Supervisor ping</td>
+                                    <td>Control Desk alert</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Data serialized from Controller
+            const categoryLabels = @Html.Raw(JsonSerializer.Serialize(ViewBag.CategoryLabels ?? new List<string>()));
+            const categoryCounts = @Html.Raw(JsonSerializer.Serialize(ViewBag.CategoryCounts ?? new List<int>()));
+
+            const deptLabels = @Html.Raw(JsonSerializer.Serialize(ViewBag.DeptLabels ?? new List<string>()));
+            const deptTotal = @Html.Raw(JsonSerializer.Serialize(ViewBag.DeptTotal ?? new List<int>()));
+            const deptResolved = @Html.Raw(JsonSerializer.Serialize(ViewBag.DeptResolved ?? new List<int>()));
+
+            const hotspotLabels = @Html.Raw(JsonSerializer.Serialize(ViewBag.HotspotLabels ?? new List<string>()));
+            const hotspotCounts = @Html.Raw(JsonSerializer.Serialize(ViewBag.HotspotCounts ?? new List<int>()));
+
+            // Colors
+            const navyBlue = '#0f2b48';
+            const institutionalGold = '#F39C12';
+            const forestGreen = '#27AE60';
+            const crimsonRed = '#C0392B';
+            const techTeal = '#16A085';
+            const slatePurple = '#8E44AD';
+
+            // 1. Category Chart (Doughnut)
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels.length ? categoryLabels : ['No Data'],
+                    datasets: [{
+                        data: categoryCounts.length ? categoryCounts : [1],
+                        backgroundColor: [navyBlue, institutionalGold, forestGreen, crimsonRed, techTeal, slatePurple],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 2. Department Workload Chart (Bar)
+            const deptCtx = document.getElementById('departmentChart').getContext('2d');
+            new Chart(deptCtx, {
+                type: 'bar',
+                data: {
+                    labels: deptLabels.length ? deptLabels : ['None'],
+                    datasets: [
+                        {
+                            label: 'Total Assigned',
+                            data: deptTotal.length ? deptTotal : [0],
+                            backgroundColor: navyBlue,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Verified Resolved',
+                            data: deptResolved.length ? deptResolved : [0],
+                            backgroundColor: forestGreen,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 3. Hotspot Matrix Chart (Horizontal Bar)
+            const hotCtx = document.getElementById('hotspotChart').getContext('2d');
+            new Chart(hotCtx, {
+                type: 'bar',
+                data: {
+                    labels: hotspotLabels.length ? hotspotLabels : ['No records'],
+                    datasets: [{
+                        label: 'Reported Incidents',
+                        data: hotspotCounts.length ? hotspotCounts : [0],
+                        backgroundColor: crimsonRed,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+}

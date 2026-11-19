@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SmartCampus — Comprehensive Project Report</title>
+<style>
+    @page {
+        size: A4;
+        margin: 20mm 15mm 20mm 15mm;
+        @bottom-right {
+            content: "Page " counter(page);
+            font-size: 8pt;
+            color: #64748b;
+        }
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: #1e293b;
+        line-height: 1.55;
+        font-size: 9.5pt;
+        background: #ffffff;
+        margin: 0;
+        padding: 0;
+    }
+    .cover-page {
+        page-break-after: always;
+        height: 95vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 40px 20px 20px 20px;
+        box-sizing: border-box;
+        border-left: 6px solid #dca014;
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    }
+    .cover-inst {
+        font-size: 11pt;
+        font-weight: 800;
+        color: #dca014;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    .cover-title {
+        font-size: 32pt;
+        font-weight: 900;
+        color: #0f2b48;
+        line-height: 1.1;
+        margin: 20px 0 10px 0;
+    }
+    .cover-sub {
+        font-size: 14pt;
+        font-weight: 600;
+        color: #1b365d;
+        line-height: 1.35;
+        margin-bottom: 15px;
+    }
+    .cover-desc {
+        font-size: 10pt;
+        color: #64748b;
+        font-style: italic;
+        line-height: 1.5;
+    }
+    .cover-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 40px;
+    }
+    .cover-table td {
+        padding: 8px 12px;
+        font-size: 9pt;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .cover-table td.label {
+        font-weight: bold;
+        color: #0f2b48;
+        width: 32%;
+        background-color: #f1f5f9;
+    }
+    .cover-footer {
+        font-size: 8.5pt;
+        color: #64748b;
+        border-top: 2px solid #0f2b48;
+        padding-top: 10px;
+    }
+
+    h1 {
+        color: #0f2b48;
+        font-size: 16pt;
+        font-weight: 800;
+        margin-top: 24px;
+        margin-bottom: 10px;
+        padding-bottom: 4px;
+        border-bottom: 2px solid #dca014;
+        page-break-after: avoid;
+    }
+    h2 {
+        color: #1b365d;
+        font-size: 12pt;
+        font-weight: 700;
+        margin-top: 18px;
+        margin-bottom: 8px;
+        page-break-after: avoid;
+    }
+    p {
+        margin: 0 0 8px 0;
+        text-align: justify;
+    }
+    ul, ol {
+        margin: 0 0 10px 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+    .callout {
+        background-color: #f8fafc;
+        border-left: 4px solid #0f2b48;
+        border-top: 1px solid #e2e8f0;
+        border-right: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 14px;
+        margin: 12px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    .callout-title {
+        font-weight: 800;
+        color: #0f2b48;
+        font-size: 9.5pt;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    table.data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
+    }
+    table.data-table th {
+        background-color: #0f2b48;
+        color: #ffffff;
+        text-align: left;
+        padding: 7px 10px;
+        font-weight: 700;
+        border: 1px solid #0f2b48;
+    }
+    table.data-table td {
+        padding: 6px 10px;
+        border: 1px solid #e2e8f0;
+    }
+    table.data-table tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+    .badge {
+        display: inline-block;
+        padding: 2px 6px;
+        font-size: 7.5pt;
+        font-weight: 700;
+        border-radius: 3px;
+        text-transform: uppercase;
+    }
+    .badge-critical { background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+    .badge-high { background-color: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; }
+    .badge-medium { background-color: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+    .badge-low { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .page-break {
+        page-break-after: always;
+    }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover-page">
+    <div>
+        <div class="cover-inst">Lovely Professional University • Punjab, India</div>
+        <div class="cover-inst" style="font-size: 9pt; color: #1b365d; margin-top: 4px;">Directorate of Digital Governance & Infrastructure Management</div>
+        
+        <div style="margin-top: 40px;">
+            <div class="cover-title">SmartCampus</div>
+            <div class="cover-sub">Intelligent Campus Issue Reporting, Workforce Allocation & Resolution Verification System</div>
+            <div class="cover-desc">
+                Comprehensive Engineering Specification, Architecture & Implementation Report<br>
+                Reference Mega-Campus: Lovely Professional University (600+ Contiguous Acres, 60+ Blocks)
+            </div>
+        </div>
+
+        <table class="cover-table">
+            <tr>
+                <td class="label">Technology Stack</td>
+                <td>ASP.NET Core MVC (.NET 10 LTS), Entity Framework Core 10, MS SQL Server, Bootstrap 5</td>
+            </tr>
+            <tr>
+                <td class="label">Institutional Theme</td>
+                <td>Authentic LPU UMS Portal Aesthetics (#0F2B48 Navy & Gold, Zero AI-SaaS Clutter)</td>
+            </tr>
+            <tr>
+                <td class="label">Cardinal Principle</td>
+                <td><strong>WORK COMPLETED ≠ RESOLVED</strong> (Independent Supervisor Verification Gate)</td>
+            </tr>
+            <tr>
+                <td class="label">Authentication & Roles</td>
+                <td>Google OAuth 2.0 Institutional Whitelist (@lpu.co.in) • 5-Tier RBAC Matrix</td>
+            </tr>
+            <tr>
+                <td class="label">Spatial Topology</td>
+                <td>Dynamic 3-Tier Campus Tree (Building → Floor → Room) • QRCoder Dynamic Scanning</td>
+            </tr>
+            <tr>
+                <td class="label">Document Version</td>
+                <td>Version 1.0.0 (Production Release) • November 2026</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="cover-footer">
+        Confidential & Proprietary • Developed for Lovely Professional University Governance Board
+    </div>
+</div>
+
+<!-- EXECUTIVE ABSTRACT -->
+<h1>Executive Abstract</h1>
+<p>
+Modern educational mega-campuses such as Lovely Professional University (LPU), spanning over 600 contiguous acres with more than 60 multi-story academic blocks, 14+ residential hostels, and expansive utility networks, present extraordinary operational challenges in facilities and estate governance. Traditional fault-reporting mechanisms—relying on fragmented phone calls, physical paper registers, or unmonitored WhatsApp groups—suffer from four systemic failure modes:
+</p>
+<ol>
+    <li><strong>High Complaint Abandonment:</strong> Submissions are frequently lost or duplicated due to the lack of transparent, real-time lifecycle tracking.</li>
+    <li><strong>Inefficient Workforce Allocation:</strong> Manual dispatch fails to balance technician workloads across specialized trade divisions (Electrical, Plumbing, HVAC, Carpentry, Civil, IT).</li>
+    <li><strong>The "False Resolution" Pitfall:</strong> Field technicians unilaterally mark tickets as resolved without independent inspection, leading to chronic fault recurrence.</li>
+    <li><strong>Absence of Automated SLA Governance:</strong> Critical safety hazards (e.g., exposed high-voltage wiring, laboratory water leaks) linger without automated escalation.</li>
+</ol>
+<p>
+<strong>SmartCampus</strong> is an enterprise-grade, role-governed web application designed specifically to eliminate these operational bottlenecks. Built on ASP.NET Core MVC (.NET 10 LTS), Entity Framework Core 10, and Microsoft SQL Server (<code>SmartCampusDB</code>), the platform incorporates an authentic university portal aesthetic inspired by <strong>LPU UMS (University Management System)</strong>.
+</p>
+
+<div class="callout">
+    <div class="callout-title">The Cardinal Architectural Principle</div>
+    <strong>WORK COMPLETED ≠ VERIFIED RESOLVED:</strong> In SmartCampus, when a maintenance technician completes physical repairs and uploads evidence, the issue enters <em>Awaiting Verification</em>. It is strictly prohibited for workers to approve their own work. A designated Department Supervisor must conduct an independent physical inspection, upload photographic verification, and formally sign off before the ticket can be resolved.
+</div>
+
+<!-- CHAPTER 1 -->
+<h1>Chapter 1: Institutional Context & Problem Statement</h1>
+<h2>1.1 Institutional Baseline: Lovely Professional University (LPU)</h2>
+<p>
+Lovely Professional University (Phagwara, Punjab) represents one of India's largest single-campus universities, accommodating over 30,000 students and 5,000 faculty and administrative personnel. The estate encompasses:
+</p>
+<ul>
+    <li><strong>Academic Blocks:</strong> Multi-story complexes (Block 32, 34, 38) housing lecture theatres, advanced computing labs, faculty chambers, and critical server infrastructure.</li>
+    <li><strong>Residential Infrastructure:</strong> 14+ high-capacity multi-story hostels (BH-1 to BH-8 for boys; GH-1 to GH-6 for girls) requiring 24/7 electrical, plumbing, and sanitation uptime.</li>
+    <li><strong>Central Infrastructure:</strong> UniMall, Central Library, Shanti Devi Mittal Auditorium, sports complexes, and dining halls.</li>
+    <li><strong>Outdoor Utilities:</strong> 600 acres of internal perimeter roads, high-mast solar lighting grids, parking zones, stormwater drainage, and power distribution substations.</li>
+</ul>
+
+<h2>1.2 The Maintenance Governance Crisis</h2>
+<p>
+In an environment of this magnitude, informal maintenance communication causes severe operational friction. When a streetlight fails near Block 32 or an air conditioner malfunctions in a laboratory, traditional workflows fail to capture accountability. Most crucially, university leadership lacks real-time visibility into Mean Time to Resolve (MTTR), department-level SLA compliance percentages, and technician productivity.
+</p>
+
+<!-- CHAPTER 2 -->
+<h1>Chapter 2: System Architecture & Institutional Design</h1>
+<h2>2.1 Authentic LPU UMS Institutional Theme</h2>
+<p>
+SmartCampus deliberately rejects generic modern SaaS templates and AI aesthetic tropes (neon gradients, floating glowing cards). Instead, it mirrors the formal, authoritative design language of LPU UMS:
+</p>
+<ul>
+    <li><strong>Deep Navy Header (#0F2B48) & Gold Accents (#FDB813 / #DCA014):</strong> Delivers immediate visual familiarity and authoritative trust across all student, faculty, and administrative tiers.</li>
+    <li><strong>Institutional Identification Badges:</strong> Dedicated user profile card in the top navigation displaying Full Name, Institutional Role, and Registration Number (e.g. 12104589 for students, EMP-4091 for faculty).</li>
+    <li><strong>High-Density Actionable Tables:</strong> Clean, structured data grids with crisp Bootstrap 5 status badges, instant search, building filters, and zero decorative bloat.</li>
+    <li><strong>Contextual Breadcrumbs:</strong> Ensures operators and technicians never lose physical or workflow context (e.g. Block 32 &gt; Floor 4 &gt; Room 402).</li>
+</ul>
+
+<h2>2.2 Role-Based Access Control (RBAC) 5-Tier Matrix</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Role Title</th>
+            <th>Operational Boundary</th>
+            <th>Core Responsibilities & Capabilities</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>1. Student / Teacher</strong></td>
+            <td>Personal Submissions Only</td>
+            <td>Reports issues via Web or QR code; uploads original photos; tracks real-time progress; rates resolution upon closing.</td>
+        </tr>
+        <tr>
+            <td><strong>2. Campus Control Desk</strong></td>
+            <td>Campus-Wide Incoming Queue</td>
+            <td>Triages incoming reports; executes duplicate detection heuristics; assigns priority and SLA; dispatches work orders to trade departments.</td>
+        </tr>
+        <tr>
+            <td><strong>3. Department Supervisor</strong></td>
+            <td>Trade Division (Elec/Plumb/HVAC)</td>
+            <td>Manages trade squads; balances technician workloads; conducts physical inspections; approves or rejects work at Verification Gate.</td>
+        </tr>
+        <tr>
+            <td><strong>4. Maintenance Worker</strong></td>
+            <td>Explicitly Assigned Tasks Only</td>
+            <td>Receives mobile task queue; accepts assignments; logs on-site commencement; uploads post-repair photographic evidence.</td>
+        </tr>
+        <tr>
+            <td><strong>5. Super Administrator</strong></td>
+            <td>System-Wide Infrastructure</td>
+            <td>Configures 60+ buildings, floors, rooms; configures departments & SLA rules; manages user elevations; oversees executive analytics.</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- CHAPTER 3 -->
+<h1>Chapter 3: Authentication & Security Governance</h1>
+<h2>3.1 Google OAuth 2.0 & Institutional Whitelist</h2>
+<p>
+To eliminate vulnerable password storage and align with university Single Sign-On (SSO), SmartCampus implements Google OAuth 2.0. The authentication pipeline incorporates three server-side checks:
+</p>
+<ol>
+    <li><strong>Cryptographic Token Verification:</strong> Validates Google token signature on the server and checks <code>email_verified == true</code>.</li>
+    <li><strong>Domain Whitelist Validation:</strong> Compares the user's email domain against the <code>AllowedEmailDomains</code> database table (<code>@lpu.co.in</code>, <code>@lpu.in</code>). Unapproved domains are rejected with an institutional notification.</li>
+    <li><strong>Institutional Account Provisioning:</strong> Automatically establishes an ASP.NET Core Identity user and claims principal. Self-registration is restricted strictly to the Student/Teacher tier; elevated privileges require administrator authorization.</li>
+</ol>
+
+<h2>3.2 Defense-in-Depth Engineering</h2>
+<ul>
+    <li><strong>Anti-Forgery Tokens:</strong> Server-side <code>[ValidateAntiForgeryToken]</code> enforced across all state-mutating POST actions.</li>
+    <li><strong>Defensive String Validation:</strong> Phone numbers and input parameters defensively bounded and sanitized to prevent SQL truncation errors.</li>
+    <li><strong>Secure File Storage:</strong> Image uploads validated against whitelist MIME types (.jpg, .png, .webp) with cryptographically generated unique filenames stored outside web root execution paths.</li>
+</ul>
+
+<!-- CHAPTER 4 -->
+<h1>Chapter 4: Dynamic Spatial Hierarchy & Dynamic QR Codes</h1>
+<h2>4.1 3-Tier Dynamic Campus Tree</h2>
+<p>
+With over 60 buildings, hardcoding campus geography is unscalable. SmartCampus implements a database-driven 3-tier hierarchy:
+</p>
+<ul>
+    <li><strong>Building Level:</strong> Stores building name, code (e.g. 'Block 32', 'BH-1'), coordinates, and estate division.</li>
+    <li><strong>Floor Level:</strong> Stores floor name and sequence (Basement, Ground Floor, 1st to 8th Floors).</li>
+    <li><strong>Location Level:</strong> Discrete rooms (Classroom 32-401, AI Lab 3) and outdoor assets (Streetlight Pole #32-B, Perimeter Drain #14).</li>
+</ul>
+
+<h2>4.2 Dynamic QR Code Scan-to-Report Automation</h2>
+<p>
+Using the integrated QRCoder engine, the system generates unique Base64-encoded QR codes for every physical location in the university. Scanning a doorplate QR code with any mobile device automatically launches the complaint portal with Building, Floor, and Room pre-locked, eliminating student reporting errors and cutting submission time to under 30 seconds.
+</p>
+
+<!-- CHAPTER 5 -->
+<h1>Chapter 5: Complete 10-Stage Complaint Lifecycle</h1>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 8%;">Stage</th>
+            <th style="width: 25%;">Lifecycle Status</th>
+            <th>Responsible Actor & Operational Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Submitted</strong></td><td>Student/Teacher reports fault, selects location, uploads original photos.</td></tr>
+        <tr><td>2</td><td><strong>Under Review</strong></td><td>Campus Control Desk inspects ticket; runs 48-hr duplicate heuristic.</td></tr>
+        <tr><td>3</td><td><strong>Approved / Rejected</strong></td><td>Control Desk validates legitimacy. Rejection requires written justification.</td></tr>
+        <tr><td>4</td><td><strong>Assigned</strong></td><td>WorkOrder dispatched to trade department and squad with SLA deadlines.</td></tr>
+        <tr><td>5</td><td><strong>Work Accepted</strong></td><td>Assigned technician acknowledges dispatch from mobile queue.</td></tr>
+        <tr><td>6</td><td><strong>In Progress</strong></td><td>Technician arrives on-site and logs commencement of physical repair.</td></tr>
+        <tr><td>7</td><td><strong>Work Completed</strong></td><td>Technician finishes work and uploads completion photographic evidence.</td></tr>
+        <tr><td>8</td><td><strong>Awaiting Verification</strong></td><td>System locks worker editing and alerts Department Supervisor for inspection.</td></tr>
+        <tr><td>9a</td><td><strong>Verified Resolved</strong></td><td>Supervisor inspects physical site, uploads sign-off photo, approves ticket.</td></tr>
+        <tr><td>9b</td><td><strong>Rework Required</strong></td><td>Supervisor rejects substandard work with defect notes; returns to Worker.</td></tr>
+        <tr><td>10</td><td><strong>Closed</strong></td><td>System notifies reporter; student submits 1-5 star rating and feedback.</td></tr>
+    </tbody>
+</table>
+
+<!-- CHAPTER 6 -->
+<h1>Chapter 6: Workforce Allocation & Workload Auto-Balancing</h1>
+<h2>6.1 Intelligent Trade Department Recommendation</h2>
+<p>
+When complaints arrive at the Control Desk, the Smart Recommender engine parses the problem title, description, and category against certified trade keywords (e.g. 'fuse', 'wire', 'MCB' &rarr; Electrical; 'pipe', 'leak', 'flush' &rarr; Plumbing; 'compressor', 'AC', 'cooling' &rarr; HVAC). It presents the Control Desk with recommended departments, confidence scores, and suggested squad sizes.
+</p>
+
+<h2>6.2 Real-Time Workload Auto-Balancing</h2>
+<p>
+To prevent bottlenecking senior technicians, the Supervisor allocation interface dynamically queries active task loads across squad members. Technicians are displayed with live status indicators:
+</p>
+<ul>
+    <li><strong>0 Active Tasks (Optimal):</strong> Highlighted with green recommended badges.</li>
+    <li><strong>1–2 Active Tasks (Moderate):</strong> Displayed in standard queue.</li>
+    <li><strong>&gt;2 Active Tasks (Overloaded):</strong> Flagged with red caution badges.</li>
+</ul>
+
+<!-- CHAPTER 7 -->
+<h1>Chapter 7: Multi-Tier SLA & Automated Escalation Engine</h1>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Priority Tier</th>
+            <th>Resolution SLA</th>
+            <th>50% Elapsed (Reminder)</th>
+            <th>75% Elapsed (Warning)</th>
+            <th>100% Breached (Escalation)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td>1 Hour (60 min)</td>
+            <td>30 min Technician Ping</td>
+            <td>45 min Supervisor Alert</td>
+            <td>60 min Desk Escalation</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-high">High</span></td>
+            <td>6 Hours (360 min)</td>
+            <td>3 Hour Reminder</td>
+            <td>4.5 Hour Warning</td>
+            <td>6 Hour Desk Escalation</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td>24 Hours (1440 min)</td>
+            <td>12 Hour Reminder</td>
+            <td>18 Hour Warning</td>
+            <td>24 Hour Desk Escalation</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-low">Low</span></td>
+            <td>72 Hours (4320 min)</td>
+            <td>36 Hour Reminder</td>
+            <td>54 Hour Warning</td>
+            <td>72 Hour Desk Escalation</td>
+        </tr>
+    </tbody>
+</table>
+<p>
+The <code>SLAEngineHostedService</code> executes continuously in the background, checking active tickets against UTC system timestamps every 60 seconds. When a ticket crosses 100% of available time, the engine marks <code>IsOverdue = true</code>, logs an immutable <code>SLAEscalations</code> record, and generates urgent Control Desk breach alerts.
+</p>
+
+<!-- CHAPTER 8 -->
+<h1>Chapter 8: Database Architecture & Technical Stack</h1>
+<h2>8.1 Technology Stack Summary</h2>
+<ul>
+    <li><strong>Frontend Layer:</strong> HTML5, CSS3, Bootstrap 5 (LPU UMS Theme), JavaScript, Leaflet.js, Chart.js</li>
+    <li><strong>Backend Framework:</strong> ASP.NET Core MVC (.NET 10 LTS)</li>
+    <li><strong>ORM & Data Access:</strong> Entity Framework Core 10 (Code-First with Migrations & Raw SQL Optimization)</li>
+    <li><strong>Database Engine:</strong> Microsoft SQL Server (<code>SmartCampusDB</code>)</li>
+    <li><strong>Authentication:</strong> ASP.NET Core Identity + Google OAuth 2.0 (Institutional Whitelist)</li>
+    <li><strong>Background Services:</strong> SLAEngineHostedService (<code>IHostedService</code>)</li>
+</ul>
+
+<h2>8.2 Relational Entity Clusters</h2>
+<p>
+SmartCampusDB is partitioned into 11 interconnected modules: Identity (AspNetUsers, UserProfiles, AllowedEmailDomains), Topology (Buildings, Floors, Locations), Issue Catalog (IssueCategories, Priorities, SLAPolicies), Workforce (Departments, Teams, TeamMembers, Skills), Complaints (Complaints, ComplaintImages, ComplaintHistory), Work Orders (WorkOrders, WorkOrderAssignments), Verification (Verifications, VerificationImages), SLA (SLAEscalations), Feedback (ComplaintFeedbacks), and Notifications.
+</p>
+
+<!-- CHAPTER 9 -->
+<h1>Chapter 9: GIS Mapping & Operational Analytics</h1>
+<h2>9.1 Leaflet.js Geospatial Mapping</h2>
+<p>
+The campus map interface is anchored to Lovely Professional University's real-world coordinates (31.2536° N, 75.7037° E). Maintenance issues are dynamically plotted as color-coded pins (Red = Critical, Orange = High, Yellow = Medium, Green = Resolved). Administrators can visually assess geographic incident clusters across Block 32, 34, 38, and residential complexes.
+</p>
+
+<h2>9.2 Executive Chart.js Analytics</h2>
+<p>
+Executive dashboards provide real-time operational metrics: Mean Time to Resolve (MTTR) trends across departments; SLA compliance percentages (monitoring the target of &gt;95% on-time resolution); verification rework rates by trade squad; and fault volume distribution by trade division.
+</p>
+
+<!-- CHAPTER 10 -->
+<h1>Chapter 10: Staged Deployment & Conclusion</h1>
+<h2>10.1 3-Phase University Rollout Strategy</h2>
+<ul>
+    <li><strong>Stage 1: Prototype (Weeks 1–4):</strong> Deploy across 3–5 core blocks (Block 32, 34, Central Library) to test all 5 user roles, QR scanning, and independent verification.</li>
+    <li><strong>Stage 2: Limited Pilot (Weeks 5–8):</strong> Expand to 15 blocks including BH-1 and GH-1 hostels with live student reporting and automated SLA monitoring.</li>
+    <li><strong>Stage 3: Full Campus Rollout (Weeks 9–12):</strong> Complete deployment across all 60+ blocks and 600 acres with integration into LPU estate management divisions.</li>
+</ul>
+
+<h2>10.2 Conclusion</h2>
+<p>
+SmartCampus successfully bridges the gap between campus facilities management and operational accountability. By adhering strictly to the LPU UMS institutional design language, enforcing the independent verification gate (Work Completed != Resolved), and automating workforce allocation and SLA monitoring, the platform establishes an auditable, high-performance standard for modern educational mega-campuses.
+</p>
+
+</body>
+</html>

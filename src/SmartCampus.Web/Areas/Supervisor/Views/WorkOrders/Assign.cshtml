@@ -1,0 +1,141 @@
+@model SmartCampus.Web.Models.Entities.WorkOrder
+@using SmartCampus.Web.Models.Entities
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = $"Allocate Squad - {Model.WorkOrderNumber}";
+    var teamMembers = ViewBag.TeamMembers as IEnumerable<TeamMember>;
+    var currentlyAssigned = Model.Assignments?.Select(a => a.WorkerUserId).ToList() ?? new List<string>();
+    var workloads = ViewBag.WorkerWorkloads as Dictionary<string, int> ?? new Dictionary<string, int>();
+
+    // Workload auto-balancing: sort available technicians with lowest active task count first
+    var sortedMembers = teamMembers?
+        .OrderBy(m => workloads.GetValueOrDefault(m.WorkerUserId, 0))
+        .ThenBy(m => m.AvailabilityStatus != WorkerAvailability.Available)
+        .ToList();
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-person-gear me-2"></i>Allocate Technicians: @Model.WorkOrderNumber</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Work Orders</a> &bull; Manpower Distribution
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Work Orders
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Work Order Brief -->
+        <div class="col-lg-6">
+            <div class="ums-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-primary font-monospace px-3 py-2">@Model.WorkOrderNumber</span>
+                    <span class="badge bg-@(Model.Complaint?.Priority?.BadgeColor ?? "secondary")">
+                        Priority: @(Model.Complaint?.Priority?.PriorityName ?? "Standard")
+                    </span>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">@(Model.Complaint?.Title)</h5>
+                <p class="text-secondary small mb-3">@(Model.Complaint?.Description)</p>
+
+                <div class="p-3 bg-light rounded border small mb-3">
+                    <div><strong>Campus Location:</strong> @(Model.Complaint?.Location?.Floor?.Building?.BuildingCode) - @(Model.Complaint?.Location?.RoomNumber)</div>
+                    <div><strong>Department Division:</strong> @Model.Department?.DepartmentName</div>
+                    <div><strong>Control Desk Instructions:</strong> @(Model.WorkSummary ?? "Standard protocol repair.")</div>
+                </div>
+
+                @if (Model.Complaint?.Images?.Any() == true)
+                {
+                    <h6 class="fw-bold small text-dark mb-2">Original Problem Photographs:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var img in Model.Complaint.Images)
+                        {
+                            <img src="@img.ImageUrl" alt="Problem" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Manpower Allocation Form -->
+        <div class="col-lg-6">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-2" style="color: #0f2b48;">
+                    <i class="bi bi-people-fill text-primary me-2"></i>Select Maintenance Technicians
+                </h6>
+                <div class="p-2 mb-3 bg-light rounded border small text-muted">
+                    <i class="bi bi-shuffle text-primary me-1"></i> <strong>Workload Auto-Balancing:</strong> Technicians are ordered with lowest active task count first to prevent bottlenecks.
+                </div>
+
+                <form asp-action="Assign" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="workOrderId" value="@Model.WorkOrderId" />
+
+                    <div class="list-group mb-4">
+                        @if (sortedMembers == null || !sortedMembers.Any())
+                        {
+                            <div class="p-3 text-muted text-center small">
+                                No technicians currently enrolled in this department's teams.
+                                Please configure squad members in Admin &gt; Departments.
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var member in sortedMembers)
+                            {
+                                bool isAssigned = currentlyAssigned.Contains(member.WorkerUserId);
+                                int activeCount = workloads.GetValueOrDefault(member.WorkerUserId, 0);
+
+                                string loadBadge = activeCount == 0 
+                                    ? "bg-success-subtle text-success border border-success-subtle" 
+                                    : (activeCount <= 2 ? "bg-info-subtle text-primary border" : "bg-danger-subtle text-danger border border-danger-subtle");
+
+                                string loadText = activeCount == 0 ? "0 Active (Optimal)" : $"{activeCount} Active Tasks";
+
+                                <label class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div class="d-flex align-items-center">
+                                        <input class="form-check-input me-3" type="checkbox" name="workerUserIds" 
+                                               value="@member.WorkerUserId" @(isAssigned ? "checked" : "") />
+                                        <div>
+                                            <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                                @(member.WorkerUser?.Email?.Split('@')[0] ?? "Technician")
+                                                @if (activeCount == 0)
+                                                {
+                                                    <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">
+                                                        <i class="bi bi-star-fill me-1"></i>Recommended
+                                                    </span>
+                                                }
+                                            </div>
+                                            <small class="text-muted">Squad: @member.Team?.TeamName &bull; @member.WorkerUser?.Email</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge @loadBadge d-block mb-1">@loadText</span>
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.65rem;">@member.AvailabilityStatus</span>
+                                    </div>
+                                </label>
+                            }
+                        }
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-ums-primary py-2">
+                            <i class="bi bi-check2-circle me-1"></i> Confirm Technician Allocation & Dispatch
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

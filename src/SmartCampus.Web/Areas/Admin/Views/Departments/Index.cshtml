@@ -1,0 +1,83 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Department>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Maintenance Departments & Workforce Directory";
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-diagram-3-fill me-2"></i>Campus Maintenance Divisions & Trade Teams</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Facilities Management Directorate &bull; Workforce Roster
+            </div>
+        </div>
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Control Desk Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-buildings-fill text-primary me-2"></i>Active Maintenance Departments (@Model.Count())</span>
+            <span class="badge bg-secondary">Campus-Wide Coverage</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Department Name</th>
+                        <th>Contact / Phone</th>
+                        <th>Teams</th>
+                        <th>Technicians</th>
+                        <th>Active Workload</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model)
+                    {
+                        var totalWorkers = d.Teams?.SelectMany(t => t.Members).Count() ?? 0;
+                        var activeOrders = d.WorkOrders?.Count(w => w.Status != WorkOrderStatus.VerifiedResolved) ?? 0;
+
+                        <tr>
+                            <td class="fw-bold font-monospace text-primary">@d.DepartmentCode</td>
+                            <td>
+                                <div class="fw-semibold text-dark">@d.DepartmentName</div>
+                                <small class="text-muted">@d.ContactEmail</small>
+                            </td>
+                            <td class="small text-muted font-monospace">
+                                @(d.ContactPhone ?? "Internal Ext")
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@d.Teams?.Count Teams</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">@totalWorkers Technicians</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">@activeOrders Active Orders</span>
+                            </td>
+                            <td>
+                                <a asp-action="Teams" asp-route-id="@d.DepartmentId" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-people-fill me-1"></i> Manage Teams & Roster
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

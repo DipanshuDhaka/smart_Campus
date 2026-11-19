@@ -1,0 +1,181 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Complaint>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Campus Triage Queue";
+    var categories = ViewBag.Categories as IEnumerable<SmartCampus.Web.Models.Entities.IssueCategory>;
+    var buildings = ViewBag.Buildings as IEnumerable<SmartCampus.Web.Models.Entities.Building>;
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-inbox-fill text-warning me-2"></i>Campus Control Desk Triage Queue</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Central Control Dispatch &bull; Complaint Triage & SLA Assignment
+            </div>
+        </div>
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Control Desk Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <!-- Filter Bar -->
+    <div class="ums-card p-3 mb-4">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <select name="statusFilter" class="form-select form-select-sm">
+                    <option value="">-- All Lifecycle Statuses --</option>
+                    @foreach (var s in Enum.GetValues<ComplaintStatus>())
+                    {
+                        bool isSel = ViewBag.StatusFilter?.ToString() == s.ToString();
+                        <option value="@s" selected="@isSel">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="categoryFilter" class="form-select form-select-sm">
+                    <option value="">-- All Categories --</option>
+                    @if (categories != null)
+                    {
+                        foreach (var cat in categories)
+                        {
+                            bool isSel = ViewBag.CategoryFilter == cat.CategoryId;
+                            <option value="@cat.CategoryId" selected="@isSel">@cat.CategoryName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="buildingFilter" class="form-select form-select-sm">
+                    <option value="">-- All Buildings / Blocks --</option>
+                    @if (buildings != null)
+                    {
+                        foreach (var b in buildings)
+                        {
+                            bool isSel = ViewBag.BuildingFilter == b.BuildingId;
+                            <option value="@b.BuildingId" selected="@isSel">@b.BuildingCode - @b.BuildingName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-ums-primary btn-sm flex-grow-1">
+                    <i class="bi bi-filter me-1"></i> Filter Queue
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Triage Table -->
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-list-columns-reverse me-2"></i>Complaints Queue (@Model.Count() Records)</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Problem Summary</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th>Reported By</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                No complaints matching your active filter criteria.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var c in Model)
+                        {
+                            string badgeClass = c.Status switch
+                            {
+                                ComplaintStatus.Submitted => "badge-submitted",
+                                ComplaintStatus.UnderReview => "badge-under-review",
+                                ComplaintStatus.Assigned => "badge-assigned",
+                                ComplaintStatus.WorkAccepted => "badge-work-accepted",
+                                ComplaintStatus.InProgress => "badge-in-progress",
+                                ComplaintStatus.WorkCompleted => "badge-work-completed",
+                                ComplaintStatus.AwaitingVerification => "badge-awaiting-verification",
+                                ComplaintStatus.VerifiedResolved => "badge-verified-resolved",
+                                ComplaintStatus.ReworkRequired => "badge-rework-required",
+                                ComplaintStatus.Closed => "badge-closed",
+                                _ => "badge-rejected"
+                            };
+
+                            <tr>
+                                <td class="fw-bold font-monospace text-primary">@c.TicketNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@c.Title</div>
+                                    <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">@c.Description</small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">@(c.Location?.Floor?.Building?.BuildingCode ?? "LPU")</span>
+                                    <div class="small text-muted">@(c.Location?.RoomNumber) (@(c.Location?.Floor?.FloorName))</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi @(c.Category?.IconCssClass ?? "bi-tools") me-1"></i>
+                                        @(c.Category?.CategoryName)
+                                    </span>
+                                </td>
+                                <td class="small">
+                                    <div class="text-dark">@(c.ReporterUser?.Email?.Split('@')[0] ?? "User")</div>
+                                    <small class="text-muted">@c.CreatedAtUtc.ToString("dd MMM, hh:mm tt")</small>
+                                </td>
+                                <td>
+                                    <span class="badge-status @badgeClass">@c.Status</span>
+                                </td>
+                                <td>
+                                    @if (c.Priority != null)
+                                    {
+                                        <span class="badge bg-@c.Priority.BadgeColor">@c.Priority.PriorityName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Unset</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (c.Status == ComplaintStatus.Submitted || c.Status == ComplaintStatus.UnderReview)
+                                    {
+                                        <a asp-action="Review" asp-route-id="@c.ComplaintId" class="btn btn-sm btn-ums-primary">
+                                            <i class="bi bi-pencil-square me-1"></i> Triage
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Review" asp-route-id="@c.ComplaintId" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-eye me-1"></i> View Details
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+@model SmartCampus.Web.Models.Entities.Building
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Add New Building";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5">
+        <h4 class="ums-page-title"><i class="bi bi-building-add me-2"></i>Add Campus Building / Block</h4>
+        <div class="ums-breadcrumb text-muted">
+            <a asp-action="Index" class="text-decoration-none">Buildings Directory</a> &bull; New Block Entry
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="ums-card p-4">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="BuildingCode" class="form-label fw-semibold small">Building Code</label>
+                            <input asp-for="BuildingCode" class="form-control" placeholder="e.g. BLK-55, BH-09" required />
+                            <span asp-validation-for="BuildingCode" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="BuildingName" class="form-label fw-semibold small">Full Building Name</label>
+                            <input asp-for="BuildingName" class="form-control" placeholder="e.g. School of Pharmaceutical Sciences" required />
+                            <span asp-validation-for="BuildingName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ZoneType" class="form-label fw-semibold small">Zone Classification</label>
+                            <select asp-for="ZoneType" class="form-select" asp-items="Html.GetEnumSelectList<BuildingZoneType>()"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="TotalFloors" class="form-label fw-semibold small">Total Floors</label>
+                            <input asp-for="TotalFloors" class="form-control" type="number" min="1" max="25" value="6" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Latitude" class="form-label fw-semibold small">GPS Latitude (LPU: ~31.2536)</label>
+                            <input asp-for="Latitude" class="form-control" type="number" step="0.000001" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Longitude" class="form-label fw-semibold small">GPS Longitude (LPU: ~75.7037)</label>
+                            <input asp-for="Longitude" class="form-control" type="number" step="0.000001" required />
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label fw-semibold small">Description / Campus Landmarks</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Key facilities, departments, or entry points"></textarea>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-ums-primary">
+                                <i class="bi bi-check-circle me-1"></i> Save Building
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

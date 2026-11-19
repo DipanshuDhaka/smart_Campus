@@ -1,0 +1,113 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.WorkOrder>
+@{
+    ViewData["Title"] = "Independent Quality Verification Gate";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-patch-check-fill text-warning me-2"></i>Independent Quality Verification Gate</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Quality Auditing &bull; Work Completed &ne; Resolved
+            </div>
+        </div>
+        <a asp-area="Supervisor" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Supervisor Hub
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Differentiator Notice Banner -->
+    <div class="alert alert-warning border-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-shield-shaded fs-3 me-3 text-warning"></i>
+        <div class="small">
+            <strong>Mandatory Physical Inspection Protocol:</strong> Technicians have completed on-site repairs and submitted after-photos. To maintain university facility standards, conduct an on-site physical inspection to either approve resolution or return for rework.
+        </div>
+    </div>
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-camera me-2"></i>Awaiting Independent Inspection (@Model.Count() Tasks)</span>
+            <span class="badge bg-warning text-dark">Gate Active</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Work Order #</th>
+                        <th>Location & Issue</th>
+                        <th>Technician</th>
+                        <th>Before Photo</th>
+                        <th>After (Repair) Photo</th>
+                        <th>Technician Notes</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-check-all text-success fs-2 d-block mb-2"></i>
+                                All field repairs have been inspected and verified!
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var wo in Model)
+                        {
+                            var initialImg = wo.Complaint?.Images?.FirstOrDefault()?.ImageUrl ?? "https://placehold.co/100x100?text=Before";
+                            var afterImg = wo.Evidence?.FirstOrDefault()?.ImageUrl ?? "https://placehold.co/100x100?text=After";
+                            var workerName = wo.Assignments?.FirstOrDefault()?.WorkerUser?.Email?.Split('@')[0] ?? "Technician";
+
+                            <tr>
+                                <td class="fw-bold font-monospace text-primary">@wo.WorkOrderNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@(wo.Complaint?.Title)</div>
+                                    <small class="text-muted">
+                                        @(wo.Complaint?.Location?.Floor?.Building?.BuildingCode) &bull; 
+                                        @(wo.Complaint?.Location?.RoomNumber)
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-person-fill text-secondary me-1"></i> @workerName
+                                    </span>
+                                </td>
+                                <td>
+                                    <img src="@initialImg" alt="Before" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" />
+                                </td>
+                                <td>
+                                    <img src="@afterImg" alt="After" class="img-thumbnail border-success" style="width: 60px; height: 60px; object-fit: cover;" />
+                                </td>
+                                <td class="small text-muted text-truncate" style="max-width: 200px;">
+                                    @(wo.WorkSummary ?? "Work finished.")
+                                </td>
+                                <td>
+                                    <a asp-action="Inspect" asp-route-id="@wo.WorkOrderId" class="btn btn-sm btn-ums-primary">
+                                        <i class="bi bi-eye-fill me-1"></i> Conduct Inspection
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

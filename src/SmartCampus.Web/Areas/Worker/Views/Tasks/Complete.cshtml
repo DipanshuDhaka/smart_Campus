@@ -1,0 +1,85 @@
+@model SmartCampus.Web.Models.Entities.WorkOrder
+@{
+    ViewData["Title"] = $"Submit Completion - {Model.WorkOrderNumber}";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-camera-fill me-2"></i>Submit Repair Completion: @Model.WorkOrderNumber</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="MyTasks" class="text-decoration-none">My Tasks</a> &bull; Completion Evidence & Inspection Handover
+            </div>
+        </div>
+        <a asp-action="MyTasks" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Tasks
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="alert alert-warning border-warning d-flex align-items-center mb-4 shadow-sm" role="alert">
+                <i class="bi bi-shield-exclamation fs-3 me-3 text-warning"></i>
+                <div class="small">
+                    <strong>Institutional Verification Policy:</strong> In SmartCampus, Work Completed &ne; Resolved. Your submitted photographs and repair summary will be routed to your Department Supervisor for on-site physical inspection. You cannot self-approve completion.
+                </div>
+            </div>
+
+            <div class="ums-card p-4 shadow-sm">
+                <!-- Task Brief -->
+                <div class="p-3 bg-light rounded border mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold font-monospace text-primary">@Model.WorkOrderNumber</span>
+                        <span class="badge bg-secondary font-monospace">@Model.Complaint?.TicketNumber</span>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">@(Model.Complaint?.Title)</h6>
+                    <div class="small text-muted">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                        @(Model.Complaint?.Location?.Floor?.Building?.BuildingCode) - @(Model.Complaint?.Location?.RoomNumber)
+                    </div>
+                </div>
+
+                <form asp-action="Complete" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="workOrderId" value="@Model.WorkOrderId" />
+
+                    <!-- Repair Summary -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">
+                            <i class="bi bi-pencil-square text-primary me-1"></i> Repair Summary & Materials Consumed
+                        </label>
+                        <textarea name="workSummary" class="form-control" rows="4" 
+                                  placeholder="Detail the physical repair carried out, parts or wiring replaced, and confirm safety checks conducted on site..." required></textarea>
+                    </div>
+
+                    <!-- Upload Completion Photos -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">
+                            <i class="bi bi-camera-fill text-warning me-1"></i> Upload After-Repair Photographs (1 to 3 Images)
+                        </label>
+                        <p class="text-muted small">
+                            Mandatory proof: Clear photographic evidence demonstrating that the fault has been rectified and the site cleaned. (Max 10MB per file: JPEG, PNG, WebP)
+                        </p>
+                        <input type="file" name="completionPhotos" class="form-control" multiple accept="image/jpeg,image/png,image/webp" required />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="MyTasks" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+                            <i class="bi bi-send-check-fill me-1"></i> Submit for Supervisor Verification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

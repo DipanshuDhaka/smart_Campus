@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "LPU SmartCampus | Facilities & Maintenance Portal";
+}
+
+<!-- Hero Banner (LPU UMS Theme) -->
+<div class="py-5 text-white" style="background: linear-gradient(135deg, #0a1e33 0%, #0f2b48 60%, #1e3a5f 100%); border-bottom: 4px solid #e86c00;">
+    <div class="container-fluid px-lg-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 mb-3 text-warning border border-light border-opacity-25 small fw-semibold">
+                    <span class="badge bg-warning text-dark me-2">UMS</span>
+                    Lovely Professional University &bull; 600-Acre Reference Campus
+                </div>
+                <h1 class="display-5 fw-bold mb-3 text-white">
+                    Intelligent Campus Maintenance, Workforce Allocation & Independent Verification System
+                </h1>
+                <p class="lead text-light opacity-75 mb-4" style="max-width: 780px;">
+                    Digitizing the complete lifecycle from instant QR-guided reporting to automated trade department dispatch, technician field repair, and mandatory independent supervisor quality verification.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-area="" asp-controller="Account" asp-action="Login" class="btn btn-ums-orange btn-lg px-4 shadow-sm">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In to UMS Portal
+                    </a>
+                    <a asp-area="" asp-controller="Home" asp-action="CampusMap" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-geo-alt-fill me-2"></i> Explore Campus GIS Map
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center d-none d-lg-block">
+                <div class="p-4 rounded-4 bg-white bg-opacity-10 border border-light border-opacity-25 shadow">
+                    <div class="bg-warning text-dark fw-bold rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow" 
+                         style="width: 80px; height: 80px; font-size: 1.8rem; border: 3px solid #ffffff;">
+                        LPU
+                    </div>
+                    <h5 class="fw-bold text-white mb-1">Quality Verified Estate</h5>
+                    <div class="badge bg-dark px-3 py-2 my-2 text-warning font-monospace">Work Completed &ne; Resolved</div>
+                    <p class="small text-light opacity-75 mb-0">
+                        Zero self-approval. Department Supervisors independently inspect every repair on site before tickets close.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Campus Metric Ribbons -->
+<div class="bg-white border-bottom py-3">
+    <div class="container-fluid px-lg-5">
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3 border-end">
+                <div class="fw-bold fs-4" style="color: #0f2b48;">600+ Acres</div>
+                <div class="small text-muted text-uppercase fw-semibold">Campus Coverage</div>
+            </div>
+            <div class="col-6 col-md-3 border-end">
+                <div class="fw-bold fs-4" style="color: #0f2b48;">60+ Blocks</div>
+                <div class="small text-muted text-uppercase fw-semibold">Academic & Hostels</div>
+            </div>
+            <div class="col-6 col-md-3 border-end">
+                <div class="fw-bold fs-4 text-warning">10 Stages</div>
+                <div class="small text-muted text-uppercase fw-semibold">Audited Lifecycle</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold fs-4 text-success">100% Verified</div>
+                <div class="small text-muted text-uppercase fw-semibold">Supervisor Inspected</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Core Architectural Pillars -->
+<div class="container-fluid px-lg-5 py-5">
+    <div class="text-center mb-5">
+        <h3 class="fw-bold" style="color: #0f2b48;">Core Engineering Innovations</h3>
+        <p class="text-muted" style="max-width: 600px; margin: 0 auto;">
+            Built strictly on enterprise .NET 10 LTS and SQL Server to eliminate university maintenance bottlenecks.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Pillar 1 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="ums-card h-100 p-4">
+                <div class="text-warning fs-1 mb-3"><i class="bi bi-shield-check"></i></div>
+                <h5 class="fw-bold text-dark">Independent Verification</h5>
+                <p class="text-muted small">
+                    Workers upload post-repair evidence photos, but cannot mark tickets resolved. A designated trade supervisor conducts on-site inspection before final sign-off.
+                </p>
+            </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="ums-card h-100 p-4">
+                <div class="text-primary fs-1 mb-3"><i class="bi bi-google"></i></div>
+                <h5 class="fw-bold text-dark">Google SSO & Whitelist</h5>
+                <p class="text-muted small">
+                    Secure authentication with Google OAuth 2.0. Dynamic database whitelist restricts registration to authorized institutional domains (e.g. @@lpu.co.in, @@lpu.in).
+                </p>
+            </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="ums-card h-100 p-4">
+                <div class="text-success fs-1 mb-3"><i class="bi bi-qr-code-scan"></i></div>
+                <h5 class="fw-bold text-dark">Dynamic QR Navigation</h5>
+                <p class="text-muted small">
+                    Every room, laboratory, and outdoor streetlight across 60+ blocks carries a dynamic QR code. Scanning auto-populates location for instant, zero-error fault reporting.
+                </p>
+            </div>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="ums-card h-100 p-4">
+                <div class="text-danger fs-1 mb-3"><i class="bi bi-stopwatch-fill"></i></div>
+                <h5 class="fw-bold text-dark">Automated SLA Escalation</h5>
+                <p class="text-muted small">
+                    Continuous background service tracks resolution targets. Automatic multi-tier triggers: 50% worker reminder, 75% supervisor warning, and 100% admin breach escalation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Role Evaluation Access -->
+    <div class="mt-5 p-4 bg-white rounded border shadow-sm text-center">
+        <h5 class="fw-bold text-dark mb-2">Project Demonstration & Evaluation Roster</h5>
+        <p class="text-muted small mb-3">
+            Test all five roles instantly using our pre-seeded institutional credentials without external setup.
+        </p>
+        <a asp-area="" asp-controller="Account" asp-action="Login" class="btn btn-ums-primary">
+            <i class="bi bi-person-badge-fill me-1"></i> Open Sign-In & Role Switcher
+        </a>
+    </div>
+</div>

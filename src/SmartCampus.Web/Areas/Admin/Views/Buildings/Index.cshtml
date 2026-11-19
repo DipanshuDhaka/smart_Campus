@@ -1,0 +1,85 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Building>
+@{
+    ViewData["Title"] = "Campus Buildings Directory (60+ Blocks)";
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-building me-2"></i>Campus Spatial Tree & Building Directory</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; 600+ Acres Estate &bull; Dynamic Spatial Hierarchy
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-ums-orange btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add New Building
+            </a>
+            <a asp-area="" asp-controller="Home" asp-action="CampusMap" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-geo-alt me-1"></i> View on GIS Map
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-diagram-3 me-2"></i>Configured Campus Blocks (@Model.Count() Blocks)</span>
+            <span class="badge bg-secondary">Zero Hardcoded Geography</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Building / Block Name</th>
+                        <th>Zone Type</th>
+                        <th>Floors</th>
+                        <th>Total Rooms</th>
+                        <th>GPS Coordinates</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        var totalRooms = b.Floors?.SelectMany(f => f.Locations).Count() ?? 0;
+                        <tr>
+                            <td class="fw-bold font-monospace text-primary">@b.BuildingCode</td>
+                            <td>
+                                <div class="fw-semibold text-dark">@b.BuildingName</div>
+                                <small class="text-muted">@b.Description</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@b.ZoneType</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@b.TotalFloors Floors</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">@totalRooms Locations</span>
+                            </td>
+                            <td class="small font-monospace text-muted">
+                                @b.Latitude.ToString("F4"), @b.Longitude.ToString("F4")
+                            </td>
+                            <td>
+                                <a asp-action="Floors" asp-route-id="@b.BuildingId" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-layers me-1"></i> Manage Floors & QR
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

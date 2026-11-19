@@ -1,0 +1,186 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Complaint>
+@using SmartCampus.Web.Models.Entities
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Campus SLA Monitoring & Escalation Desk";
+    var escalations = ViewBag.Escalations as IEnumerable<SLAEscalation>;
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-stopwatch text-danger me-2"></i>Campus SLA Monitoring & Automated Escalation Desk</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Facilities SLA Compliance &bull; Automated Multi-Tier Engine
+            </div>
+        </div>
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Control Desk Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    <!-- Stat Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-4">
+            <div class="ums-stat-card stat-success">
+                <div class="ums-stat-number text-success">@ViewBag.ComplianceRate%</div>
+                <div class="ums-stat-label">Campus SLA Compliance Rate</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="ums-stat-card stat-danger">
+                <div class="ums-stat-number text-danger">@ViewBag.OverdueCount</div>
+                <div class="ums-stat-label">Currently Overdue Tickets</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-4">
+            <div class="ums-stat-card">
+                <div class="ums-stat-number">@ViewBag.TotalComplaints</div>
+                <div class="ums-stat-label">Total Lifecycle Complaints</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Tier Rules Info Banner -->
+    <div class="alert alert-secondary border-secondary d-flex align-items-center mb-4 small" role="alert">
+        <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
+        <div>
+            <strong>Automated SLA Engine Thresholds:</strong>
+            <span class="badge bg-info text-dark ms-2 me-1">Tier 1 (50% Elapsed)</span> In-app reminder to technician.
+            <span class="badge bg-warning text-dark me-1">Tier 2 (75% Elapsed)</span> Warning to Department Supervisor.
+            <span class="badge bg-danger me-1">Tier 3 (100% Breached)</span> Critical escalation to Control Desk &amp; Administrator with <code class="text-danger fw-bold">IsOverdue = true</code>.
+        </div>
+    </div>
+
+    <!-- Overdue Complaints Table -->
+    <div class="ums-card mb-4">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Active SLA Breaches (@Model.Count() Overdue Tickets)</span>
+            <span class="badge bg-danger">Critical Priority</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Problem Summary</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Resolution Target</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                <i class="bi bi-shield-check text-success fs-3 d-block mb-1"></i>
+                                Excellent! No active complaints have breached their SLA resolution target.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var c in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold font-monospace text-danger">@c.TicketNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@c.Title</div>
+                                    <small class="text-muted">Status: @c.Status</small>
+                                </td>
+                                <td class="small">
+                                    <div class="fw-semibold">@(c.Location?.Floor?.Building?.BuildingCode)</div>
+                                    <div class="text-muted">@(c.Location?.RoomNumber)</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@(c.Category?.CategoryName)</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(c.Priority?.BadgeColor ?? "danger")">@(c.Priority?.PriorityName)</span>
+                                </td>
+                                <td class="small text-danger fw-bold font-monospace">
+                                    @c.ResolutionDeadlineUtc?.ToString("dd MMM, hh:mm tt")
+                                </td>
+                                <td>
+                                    <a asp-area="Admin" asp-controller="Triage" asp-action="Review" asp-route-id="@c.ComplaintId" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-lightning-fill me-1"></i> Expedite
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SLA Escalation History Audit Table -->
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-clock-history me-2"></i>Automated SLA Escalation Audit Trail</span>
+            <span class="badge bg-secondary">Recent Logs</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Work Order #</th>
+                        <th>Parent Ticket</th>
+                        <th>Escalation Tier</th>
+                        <th>Triggered Timestamp (UTC)</th>
+                        <th>Breach Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (escalations == null || !escalations.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No escalation records triggered yet.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var esc in escalations)
+                        {
+                            string tierBadge = esc.EscalationTier switch
+                            {
+                                EscalationTier.Tier1_Reminder => "bg-info text-dark",
+                                EscalationTier.Tier2_Warning => "bg-warning text-dark",
+                                _ => "bg-danger"
+                            };
+
+                            <tr>
+                                <td class="font-monospace fw-bold">@(esc.WorkOrder?.WorkOrderNumber ?? "WO-System")</td>
+                                <td>
+                                    <div class="text-dark small">@(esc.WorkOrder?.Complaint?.Title ?? "Task")</div>
+                                </td>
+                                <td>
+                                    <span class="badge @tierBadge">@esc.EscalationTier</span>
+                                </td>
+                                <td class="small text-muted font-monospace">
+                                    @esc.TriggeredAtUtc.ToString("dd MMM yyyy, hh:mm:ss tt")
+                                </td>
+                                <td>
+                                    @if (esc.BreachMinutes > 0)
+                                    {
+                                        <span class="badge bg-danger">@esc.BreachMinutes mins overdue</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Pre-Breach Warning</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

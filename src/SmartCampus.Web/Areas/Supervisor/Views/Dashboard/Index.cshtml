@@ -1,0 +1,136 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.WorkOrder>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Department Supervisor & Verification Hub";
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-shield-check me-2"></i>Department Supervisor & Quality Verification Gate</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Trade Maintenance Division &bull; Independent Verification
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-warning text-dark p-2 fs-6">
+                <i class="bi bi-patch-check-fill me-1"></i> Quality Gatekeeper Active
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <!-- Stat Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-warning">
+                <div class="ums-stat-number text-warning">@ViewBag.PendingVerification</div>
+                <div class="ums-stat-label">Awaiting Verification (Inspections)</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-teal">
+                <div class="ums-stat-number" style="color: #0d9488;">@ViewBag.ActiveWorkOrders</div>
+                <div class="ums-stat-label">Active Field Tasks</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-danger">
+                <div class="ums-stat-number text-danger">@ViewBag.ReworkCount</div>
+                <div class="ums-stat-label">Rework Mandated</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-success">
+                <div class="ums-stat-number text-success">@ViewBag.VerifiedCount</div>
+                <div class="ums-stat-label">Verified Resolved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Differentiator Callout Banner -->
+    <div class="alert alert-info border-info d-flex align-items-center mb-4 shadow-sm" role="alert">
+        <i class="bi bi-info-circle-fill fs-3 me-3 text-info"></i>
+        <div>
+            <strong>Institutional Quality Rule:</strong> Maintenance Technicians submit completed work with after-photos, but cannot mark issues resolved. As Department Supervisor, your physical on-site inspection and photographic sign-off is mandatory before any complaint is closed.
+        </div>
+    </div>
+
+    <!-- Verification Queue -->
+    <div class="ums-card">
+        <div class="ums-card-header bg-white">
+            <span class="fw-bold"><i class="bi bi-camera-fill text-warning me-2"></i>Pending Physical Inspections (Verification Queue)</span>
+            <span class="badge bg-warning text-dark">@Model.Count() Inspections Waiting</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Work Order #</th>
+                        <th>Location & Issue</th>
+                        <th>Technician</th>
+                        <th>Before Photo</th>
+                        <th>After (Repair) Photo</th>
+                        <th>Status</th>
+                        <th>Inspection Sign-Off</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-patch-check text-success fs-2 d-block mb-2"></i>
+                                All completed tasks have been verified. No pending inspections in queue.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var wo in Model)
+                        {
+                            var initialImg = wo.Complaint?.Images?.FirstOrDefault()?.ImageUrl ?? "/images/no-image.png";
+                            var afterImg = wo.Evidence?.FirstOrDefault()?.ImageUrl ?? "/images/no-image.png";
+                            var workerName = wo.Assignments?.FirstOrDefault()?.WorkerUser?.Email?.Split('@')[0] ?? "Technician";
+
+                            <tr>
+                                <td class="fw-bold font-monospace">@wo.WorkOrderNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@(wo.Complaint?.Title ?? "Maintenance Task")</div>
+                                    <small class="text-muted">
+                                        @(wo.Complaint?.Location?.Floor?.Building?.BuildingCode ?? "LPU") &bull; 
+                                        @(wo.Complaint?.Location?.RoomNumber ?? "General")
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-person-fill text-secondary me-1"></i> @workerName
+                                    </span>
+                                </td>
+                                <td>
+                                    <img src="@initialImg" alt="Before" class="img-thumbnail" style="width: 55px; height: 55px; object-fit: cover;" 
+                                         onerror="this.src='https://placehold.co/100x100?text=Before+Photo'" />
+                                </td>
+                                <td>
+                                    <img src="@afterImg" alt="After" class="img-thumbnail border-success" style="width: 55px; height: 55px; object-fit: cover;" 
+                                         onerror="this.src='https://placehold.co/100x100?text=After+Photo'" />
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-awaiting-verification">@wo.Status</span>
+                                </td>
+                                <td>
+                                    <a asp-area="Supervisor" asp-controller="Verification" asp-action="Inspect" asp-route-id="@wo.WorkOrderId" 
+                                       class="btn btn-sm btn-ums-primary">
+                                        <i class="bi bi-eye-fill me-1"></i> Inspect & Sign-off
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

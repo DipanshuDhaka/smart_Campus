@@ -1,0 +1,137 @@
+@model SmartCampus.Web.Models.Entities.Team
+@using Microsoft.AspNetCore.Identity
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = $"Technicians - {Model.TeamName}";
+    var availableWorkers = ViewBag.AvailableWorkers as IList<IdentityUser>;
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-tools me-2"></i>@Model.TeamName — Technicians</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Departments</a> &bull; 
+                <a asp-action="Teams" asp-route-id="@Model.DepartmentId" class="text-decoration-none">@Model.Department?.DepartmentCode Teams</a> &bull; 
+                Technician Roster & Workload
+            </div>
+        </div>
+        <a asp-action="Teams" asp-route-id="@Model.DepartmentId" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Teams
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Add Technician Form -->
+        <div class="col-md-4">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;"><i class="bi bi-person-plus me-1"></i> Add Technician to Squad</h6>
+                <form asp-action="AddWorkerToTeam" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="teamId" value="@Model.TeamId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Select Technician</label>
+                        <select name="workerUserId" class="form-select" required>
+                            <option value="">-- Choose Registered Worker --</option>
+                            @if (availableWorkers != null)
+                            {
+                                foreach (var w in availableWorkers)
+                                {
+                                    <option value="@w.Id">@w.Email (@(w.PhoneNumber ?? "No Phone"))</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-ums-primary w-100">
+                        <i class="bi bi-person-check-fill me-1"></i> Assign to Team Roster
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Technicians Roster -->
+        <div class="col-md-8">
+            <div class="ums-card">
+                <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-people-fill text-primary me-2"></i>Active Squad Roster (@Model.Members.Count Technicians)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table ums-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Technician Email / ID</th>
+                                <th>Contact Number</th>
+                                <th>Availability State</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Members.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No technicians enrolled in this squad yet.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var m in Model.Members)
+                                {
+                                    string availBadge = m.AvailabilityStatus switch
+                                    {
+                                        WorkerAvailability.Available => "bg-success",
+                                        WorkerAvailability.Busy => "bg-warning text-dark",
+                                        WorkerAvailability.Overloaded => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark">@(m.WorkerUser?.Email?.Split('@')[0] ?? "Technician")</div>
+                                            <small class="text-muted">@m.WorkerUser?.Email</small>
+                                        </td>
+                                        <td class="font-monospace small">
+                                            @(m.WorkerUser?.PhoneNumber ?? "+91-98765-XXXXX")
+                                        </td>
+                                        <td>
+                                            <span class="badge @availBadge">@m.AvailabilityStatus</span>
+                                        </td>
+                                        <td>
+                                            <form asp-action="ToggleAvailability" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="memberId" value="@m.TeamMemberId" />
+                                                <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                                    @foreach (var st in Enum.GetValues<WorkerAvailability>())
+                                                    {
+                                                        bool isSel = m.AvailabilityStatus == st;
+                                                        <option value="@st" selected="@isSel">@st</option>
+                                                    }
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

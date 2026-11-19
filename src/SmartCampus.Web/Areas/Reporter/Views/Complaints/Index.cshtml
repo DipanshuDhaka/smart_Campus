@@ -1,0 +1,115 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Complaint>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "My Reported Complaints";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-card-checklist me-2"></i>My Reported Campus Issues</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Student & Faculty Maintenance Ledger
+            </div>
+        </div>
+        <a asp-action="Create" class="btn btn-ums-orange btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Report New Issue
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-inbox-fill text-primary me-2"></i>Submitted Complaints History (@Model.Count())</span>
+            <span class="badge bg-secondary">Real-Time Updates</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Issue Summary</th>
+                        <th>Campus Location</th>
+                        <th>Category</th>
+                        <th>Reported Date</th>
+                        <th>Resolution Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-clipboard2-check text-muted fs-1 d-block mb-2"></i>
+                                You have not filed any maintenance complaints yet.
+                                <div class="mt-2">
+                                    <a asp-action="Create" class="btn btn-ums-primary btn-sm">
+                                        <i class="bi bi-plus-lg me-1"></i> Report an Issue
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            string badgeClass = item.Status switch
+                            {
+                                ComplaintStatus.Submitted => "badge-submitted",
+                                ComplaintStatus.UnderReview => "badge-under-review",
+                                ComplaintStatus.Assigned => "badge-assigned",
+                                ComplaintStatus.WorkAccepted => "badge-work-accepted",
+                                ComplaintStatus.InProgress => "badge-in-progress",
+                                ComplaintStatus.WorkCompleted => "badge-work-completed",
+                                ComplaintStatus.AwaitingVerification => "badge-awaiting-verification",
+                                ComplaintStatus.VerifiedResolved => "badge-verified-resolved",
+                                ComplaintStatus.ReworkRequired => "badge-rework-required",
+                                ComplaintStatus.Closed => "badge-closed",
+                                _ => "badge-rejected"
+                            };
+
+                            <tr>
+                                <td class="fw-bold font-monospace text-primary">@item.TicketNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@item.Title</div>
+                                    <small class="text-muted text-truncate d-inline-block" style="max-width: 280px;">@item.Description</small>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@(item.Location?.Floor?.Building?.BuildingCode ?? "LPU")</div>
+                                    <small class="text-muted">@(item.Location?.RoomNumber ?? "General") (@(item.Location?.Floor?.FloorName ?? "Ground"))</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi @(item.Category?.IconCssClass ?? "bi-tools") me-1"></i>
+                                        @(item.Category?.CategoryName ?? "General")
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    @item.CreatedAtUtc.ToString("dd MMM yyyy, hh:mm tt")
+                                </td>
+                                <td>
+                                    <span class="badge-status @badgeClass">@item.Status</span>
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.ComplaintId" class="btn btn-sm btn-outline-dark">
+                                        <i class="bi bi-eye-fill me-1"></i> Track Progress
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

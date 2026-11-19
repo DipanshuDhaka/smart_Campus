@@ -1,0 +1,443 @@
+@model SmartCampus.Web.Models.Entities.Complaint
+@using SmartCampus.Web.Models.Entities
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = $"Triage Review - Ticket {Model.TicketNumber}";
+    var potentialDuplicates = ViewBag.PotentialDuplicates as IEnumerable<Complaint>;
+    var priorities = ViewBag.Priorities as IEnumerable<Priority>;
+    var departments = ViewBag.Departments as IEnumerable<Department>;
+    var defaultDeptId = Model.Category?.DefaultDepartmentId ?? departments?.FirstOrDefault()?.DepartmentId ?? 1;
+    var rec = ViewBag.Recommendation as SmartCampus.Web.Services.DepartmentRecommendationResult;
+    var teams = ViewBag.Teams as IEnumerable<Team>;
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-clipboard2-pulse me-2"></i>Triage Review: Ticket @Model.TicketNumber</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Triage Queue</a> &bull; Inspection & Workforce Dispatch
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Queue
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- 1. DUPLICATE DETECTION HEURISTIC BANNER -->
+    @if (potentialDuplicates != null && potentialDuplicates.Any())
+    {
+        <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-exclamation-diamond-fill text-warning fs-4 me-2"></i>
+                <h6 class="fw-bold mb-0 text-dark">
+                    Potential Duplicate Issues Detected (@potentialDuplicates.Count() matching tickets in last 48 hours)
+                </h6>
+            </div>
+            <p class="small text-muted mb-2">
+                The duplicate detection engine found other complaints logged at the same location and category. Review these tickets to prevent duplicate workforce dispatch:
+            </p>
+            <ul class="mb-0 small">
+                @foreach (var dup in potentialDuplicates)
+                {
+                    <li>
+                        <strong>Ticket @dup.TicketNumber:</strong> "@dup.Title" (Status: <span class="badge bg-secondary">@dup.Status</span>) 
+                        &bull; Reported by @(dup.ReporterUser?.Email?.Split('@')[0]) at @dup.CreatedAtUtc.ToString("dd MMM, hh:mm tt")
+                        &bull; <a asp-action="Review" asp-route-id="@dup.ComplaintId" target="_blank" class="text-primary fw-semibold">Inspect Ticket</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column: Issue Dossier & Evidence -->
+        <div class="col-lg-7">
+            <div class="ums-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-primary px-3 py-2 font-monospace">@Model.TicketNumber</span>
+                    <span class="badge bg-light text-dark border p-2">
+                        <i class="bi @(Model.Category?.IconCssClass ?? "bi-tools") me-1 text-primary"></i>
+                        @(Model.Category?.CategoryName)
+                    </span>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">@Model.Title</h5>
+                <p class="text-secondary" style="white-space: pre-line;">@Model.Description</p>
+
+                <!-- Photographs -->
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold small text-dark mb-2">Attached Problem Evidence (Reporter Uploads):</h6>
+                    @if (!Model.Images.Any())
+                    {
+                        <p class="text-muted small fst-italic">No photographs uploaded with this complaint.</p>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var img in Model.Images)
+                            {
+                                <a href="@img.ImageUrl" target="_blank">
+                                    <img src="@img.ImageUrl" alt="Issue Evidence" class="img-thumbnail" 
+                                         style="width: 140px; height: 140px; object-fit: cover;" />
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Location Details -->
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Physical Campus Location
+                </h6>
+                <div class="row g-3 small">
+                    <div class="col-sm-6">
+                        <strong>Building / Block:</strong> 
+                        <div>@(Model.Location?.Floor?.Building?.BuildingCode) - @(Model.Location?.Floor?.Building?.BuildingName)</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Floor Level:</strong> 
+                        <div>@(Model.Location?.Floor?.FloorName)</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Room / Facility:</strong> 
+                        <div>@(Model.Location?.RoomNumber) (@(Model.Location?.LocationName))</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <strong>Reporter Callback:</strong> 
+                        <div>@(Model.ReporterContactPhone ?? "Not provided")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Triage Actions & Workforce Dispatch -->
+        <div class="col-lg-5">
+            @if (Model.WorkOrders != null && Model.WorkOrders.Any())
+            {
+                <div class="ums-card p-4 mb-4 border border-success shadow-sm bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield-lock-fill text-success fs-4 me-2"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-success">
+                                    Dispatched Work Order Dossier (Locked)
+                                </h6>
+                                <small class="text-muted" style="font-size: 0.72rem;">1 Assignment Policy Enforced &bull; Duplicate dispatch disabled</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success">Dispatched</span>
+                    </div>
+
+                    @foreach (var wo in Model.WorkOrders)
+                    {
+                        <div class="p-3 bg-white rounded border mb-2 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold font-monospace text-primary">@wo.WorkOrderNumber</span>
+                                <span class="badge bg-primary">@wo.Status</span>
+                            </div>
+                            <div class="small text-muted mb-1">
+                                <strong>Department:</strong> @wo.Department?.DepartmentName (@wo.Department?.DepartmentCode)
+                            </div>
+                            <div class="small text-muted mb-1">
+                                <strong>Responsible Squad:</strong> @(wo.Team?.TeamName ?? "General Trade Squad")
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <strong>Supervisor / Team Head:</strong> @(wo.Team?.SupervisorUser?.Email?.Split('@')[0] ?? "Department Head")
+                            </div>
+                            <div class="small text-muted mb-3">
+                                <strong>Assigned Technicians:</strong>
+                                @if (wo.Assignments.Any())
+                                {
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        @foreach (var a in wo.Assignments)
+                                        {
+                                            <span class="badge bg-success text-white border">
+                                                <i class="bi bi-person-fill me-1"></i>@(a.WorkerUser?.Email?.Split('@')[0] ?? "Technician")
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-clock-history me-1"></i>Pending technician allocation by Supervisor
+                                    </div>
+                                }
+                            </div>
+                            <a asp-area="Supervisor" asp-controller="WorkOrders" asp-action="Assign" asp-route-id="@wo.WorkOrderId" 
+                               class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-people-fill me-1"></i> Manage Squad & Allocate Technicians
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.WorkOrders == null || !Model.WorkOrders.Any())
+            {
+                <div class="ums-card p-4">
+                    <h6 class="fw-bold mb-3" style="color: #0f2b48;">
+                        <i class="bi bi-check2-circle text-success me-1"></i> Triage Decision & Work Order Dispatch
+                    </h6>
+
+                    <form asp-action="Approve" method="post" id="triageApproveForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
+
+                        <!-- Priority & SLA Policy -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Priority & SLA Policy</label>
+                            <select name="priorityId" class="form-select" required>
+                                @if (priorities != null)
+                                {
+                                    foreach (var p in priorities)
+                                    {
+                                        bool isDefault = p.PriorityName == "Medium";
+                                        var slaMin = p.SLAPolicy?.ResolutionTargetMinutes ?? 1440;
+                                        var slaHours = slaMin / 60;
+                                        <option value="@p.PriorityId" selected="@isDefault">
+                                            @p.PriorityName — SLA Target: @slaHours hours (@(slaMin) mins)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <small class="text-muted" style="font-size: 0.72rem;">
+                                Controls automated 50% reminder, 75% warning, and 100% escalation deadlines.
+                            </small>
+                        </div>
+
+                        <!-- Smart Trade & Department Recommender Card -->
+                        @if (rec != null)
+                        {
+                            <div class="p-3 mb-3 bg-light rounded border border-primary-subtle" style="background-color: #f8fafd !important;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold text-dark small">
+                                        <i class="bi bi-cpu-fill text-primary me-1"></i> Smart Department Recommender
+                                    </span>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                        @rec.ConfidencePercentage% Match
+                                    </span>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    Trade Scope: <strong class="text-dark">@rec.DepartmentName (@rec.DepartmentCode)</strong>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    Recommended Crew: <span class="badge bg-secondary">@rec.SuggestedTechnicians Technicians</span>
+                                </div>
+                                @if (rec.MatchedKeywords.Any())
+                                {
+                                    <div class="mb-2">
+                                        <span class="text-muted small" style="font-size: 0.75rem;">Matched Keywords:</span>
+                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                            @foreach (var kw in rec.MatchedKeywords)
+                                            {
+                                                <span class="badge bg-light text-dark border" style="font-size: 0.68rem;">#@kw</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2 w-100" style="font-size: 0.78rem;" 
+                                        onclick="applyRecommendation(@rec.DepartmentId, @rec.SuggestedTechnicians, '@rec.DepartmentCode')">
+                                    <i class="bi bi-check-circle me-1"></i> Apply Recommendation
+                                </button>
+                            </div>
+                        }
+
+                        <!-- Target Department -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Target Maintenance Department</label>
+                            <select name="departmentId" class="form-select" id="deptSelect" onchange="filterTeams()" required>
+                                @if (departments != null)
+                                {
+                                    foreach (var d in departments)
+                                    {
+                                        bool isSelected = d.DepartmentId == defaultDeptId;
+                                        <option value="@d.DepartmentId" selected="@isSelected">
+                                            @d.DepartmentName (@d.DepartmentCode)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <small class="text-success" style="font-size: 0.72rem;">
+                                <i class="bi bi-magic me-1"></i> Recommended based on Issue Category: @(Model.Category?.CategoryName)
+                            </small>
+                        </div>
+
+                        <!-- Responsible Trade Squad & Supervisor (Authority) -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Responsible Trade Squad & Supervisor (Team Head)</label>
+                            <select name="teamId" class="form-select" id="teamSelect" onchange="filterTechnicians()">
+                                <option value="">-- Assign to Department Supervisor --</option>
+                                @if (teams != null)
+                                {
+                                    foreach (var t in teams)
+                                    {
+                                        <option value="@t.TeamId" data-dept="@t.DepartmentId">
+                                            @t.TeamName &bull; Supervisor: @(t.SupervisorUser?.Email?.Split('@')[0] ?? "Team Lead")
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <small class="text-muted" style="font-size: 0.72rem;">
+                                Directly assigns this work order to the designated supervisor's queue for workforce dispatch.
+                            </small>
+                        </div>
+
+                        <!-- Direct Technician Allocation (Electrician / Plumber) -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Allocate Maintenance Technician (Field Execution)</label>
+                            <select name="technicianUserId" class="form-select" id="techSelect">
+                                <option value="">-- Auto-Allocate to Team's Available Technician --</option>
+                                @if (ViewBag.Technicians is IEnumerable<SmartCampus.Web.Models.Entities.TeamMember> techList)
+                                {
+                                    foreach (var tech in techList)
+                                    {
+                                        <option value="@tech.WorkerUserId" data-dept="@tech.Team?.DepartmentId" data-team="@tech.TeamId">
+                                            @(tech.WorkerUser?.Email?.Split('@')[0]) (@tech.Team?.TeamName)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <small class="text-info" style="font-size: 0.72rem;">
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Instantly dispatches this task into the selected technician's portal.
+                            </small>
+                        </div>
+
+                        <!-- Work Order Instructions -->
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Work Order Directives / Notes</label>
+                            <textarea name="instructions" class="form-control" rows="3" 
+                                      placeholder="Specific safety instructions, required tools, or notes for the trade team supervisor..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-ums-primary py-2">
+                                <i class="bi bi-send-check-fill me-1"></i> Approve & Dispatch Work Order
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                                <i class="bi bi-x-circle me-1"></i> Reject Complaint (Duplicate / Invalid)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reject" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="complaintId" value="@Model.ComplaintId" />
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="rejectModalLabel">Reject Maintenance Complaint</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">
+                        Please provide a mandatory justification reason. This remark will be logged into the audit trail and sent to the reporter.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Rejection Justification</label>
+                        <textarea name="rejectionReason" class="form-control" rows="3" placeholder="e.g. Duplicate of active ticket SC-2026-00034; work is already in progress." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterTeams() {
+            const deptSelect = document.getElementById('deptSelect');
+            const teamSelect = document.getElementById('teamSelect');
+            if (!deptSelect || !teamSelect) return;
+            
+            const selectedDept = deptSelect.value;
+            let firstMatchingValue = null;
+            let currentSelectedStillValid = false;
+
+            for (let i = 0; i < teamSelect.options.length; i++) {
+                const opt = teamSelect.options[i];
+                if (!opt.value) continue;
+                const teamDept = opt.getAttribute('data-dept');
+                if (!selectedDept || teamDept === selectedDept) {
+                    opt.style.display = '';
+                    if (firstMatchingValue === null) firstMatchingValue = opt.value;
+                    if (opt.value === teamSelect.value) currentSelectedStillValid = true;
+                } else {
+                    opt.style.display = 'none';
+                }
+            }
+
+            if (!currentSelectedStillValid && firstMatchingValue) {
+                teamSelect.value = firstMatchingValue;
+            } else if (!currentSelectedStillValid) {
+                teamSelect.value = '';
+            }
+
+            filterTechnicians();
+        }
+
+        function filterTechnicians() {
+            const deptSelect = document.getElementById('deptSelect');
+            const teamSelect = document.getElementById('teamSelect');
+            const techSelect = document.getElementById('techSelect');
+            if (!techSelect) return;
+
+            const selectedDept = deptSelect ? deptSelect.value : '';
+            const selectedTeam = teamSelect ? teamSelect.value : '';
+
+            for (let i = 0; i < techSelect.options.length; i++) {
+                const opt = techSelect.options[i];
+                if (!opt.value) continue;
+                const techDept = opt.getAttribute('data-dept');
+                const techTeam = opt.getAttribute('data-team');
+
+                let match = true;
+                if (selectedTeam && techTeam !== selectedTeam) {
+                    match = false;
+                } else if (!selectedTeam && selectedDept && techDept !== selectedDept) {
+                    match = false;
+                }
+
+                opt.style.display = match ? '' : 'none';
+            }
+        }
+
+        function applyRecommendation(deptId, suggestedTechs, deptCode) {
+            const select = document.getElementById('deptSelect');
+            if (select && deptId) {
+                select.value = deptId;
+                filterTeams();
+                const textarea = document.querySelector('textarea[name="instructions"]');
+                if (textarea && !textarea.value) {
+                    textarea.value = `Dispatch authorized for ${deptCode}. Recommended squad size: ${suggestedTechs} technician(s).`;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            filterTeams();
+        });
+    </script>
+}

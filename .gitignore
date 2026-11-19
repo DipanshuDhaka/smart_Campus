@@ -1,0 +1,21 @@
+## Visual Studio / .NET Core
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Uploads (preserve folder, ignore user-uploaded test binaries)
+src/SmartCampus.Web/wwwroot/uploads/*
+!src/SmartCampus.Web/wwwroot/uploads/.gitkeep
+
+## OS Generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

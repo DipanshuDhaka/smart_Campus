@@ -1,0 +1,124 @@
+@model SmartCampus.Web.Models.Entities.Department
+@using Microsoft.AspNetCore.Identity
+@{
+    ViewData["Title"] = $"Trade Teams - {Model.DepartmentName}";
+    var supervisors = ViewBag.Supervisors as IList<IdentityUser>;
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-people me-2"></i>@Model.DepartmentName Teams</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Departments</a> &bull; Trade Squad Hierarchy
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Departments
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Add Team Form -->
+        <div class="col-md-4">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;"><i class="bi bi-plus-circle me-1"></i> Create Trade Team</h6>
+                <form asp-action="CreateTeam" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="departmentId" value="@Model.DepartmentId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Team Name</label>
+                        <input type="text" name="teamName" class="form-control" placeholder="e.g. Block 30-38 Electrical Squad" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Designated Supervisor (Team Head)</label>
+                        <select name="supervisorUserId" class="form-select" required>
+                            <option value="">-- Select Supervisor --</option>
+                            @if (supervisors != null)
+                            {
+                                foreach (var s in supervisors)
+                                {
+                                    <option value="@s.Id">@s.Email</option>
+                                }
+                            }
+                        </select>
+                        <small class="text-muted" style="font-size: 0.72rem;">Supervisors perform independent verification sign-off.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-ums-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i> Add Team
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Teams List -->
+        <div class="col-md-8">
+            <div class="ums-card">
+                <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-list-task me-2"></i>Active Teams in @Model.DepartmentCode (@Model.Teams.Count)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table ums-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Team Name</th>
+                                <th>Supervisor / Team Head</th>
+                                <th>Technicians</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Teams.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No trade teams configured for this department yet.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var t in Model.Teams)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-dark">@t.TeamName</td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark border">
+                                                <i class="bi bi-shield-shaded me-1"></i>
+                                                @(t.SupervisorUser?.Email?.Split('@')[0] ?? "Unassigned")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info text-dark">@t.Members.Count Technicians</span>
+                                        </td>
+                                        <td>
+                                            <a asp-action="Workers" asp-route-teamId="@t.TeamId" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-tools me-1"></i> Manage Technicians
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

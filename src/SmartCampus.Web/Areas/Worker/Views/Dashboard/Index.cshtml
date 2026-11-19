@@ -1,0 +1,145 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.WorkOrderAssignment>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Technician Field Portal | My Tasks";
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-tools me-2"></i>Technician Field Portal & Task Execution</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Maintenance Field Unit &bull; Mobile Task Center
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-success p-2">
+                <i class="bi bi-check-circle me-1"></i> Active On Duty
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <!-- Stat Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card">
+                <div class="ums-stat-number">@ViewBag.TotalAssigned</div>
+                <div class="ums-stat-label">Total Assigned</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-warning">
+                <div class="ums-stat-number text-warning">@ViewBag.InProgress</div>
+                <div class="ums-stat-label">In Progress</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-teal">
+                <div class="ums-stat-number" style="color: #0d9488;">@ViewBag.SubmittedVerification</div>
+                <div class="ums-stat-label">Awaiting Verification</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="ums-stat-card stat-success">
+                <div class="ums-stat-number text-success">@ViewBag.VerifiedResolved</div>
+                <div class="ums-stat-label">Supervisor Verified</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technician Tasks List -->
+    <div class="ums-card">
+        <div class="ums-card-header bg-white">
+            <span class="fw-bold"><i class="bi bi-card-checklist me-2"></i>My Field Work Orders</span>
+            <span class="badge bg-secondary">Assigned to You</span>
+        </div>
+        <div class="p-3">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-clipboard-check text-muted fs-1 d-block mb-2"></i>
+                    No maintenance tasks currently assigned to your roster.
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var item in Model)
+                    {
+                        var wo = item.WorkOrder;
+                        if (wo == null) continue;
+
+                        string borderClass = wo.Status == WorkOrderStatus.ReworkRequired ? "border-danger" : "border-secondary";
+                        
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card h-100 shadow-sm border @borderClass">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold font-monospace small">@wo.WorkOrderNumber</span>
+                                    <span class="badge bg-primary">@wo.Status</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold text-dark">@(wo.Complaint?.Title ?? "Task")</h6>
+                                    <p class="card-text text-muted small mb-2">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        <strong>@(wo.Complaint?.Location?.Floor?.Building?.BuildingCode ?? "LPU")</strong> &bull; 
+                                        @(wo.Complaint?.Location?.RoomNumber ?? "General") 
+                                        (@(wo.Complaint?.Location?.Floor?.FloorName ?? "Ground"))
+                                    </p>
+                                    <div class="small mb-3">
+                                        <span class="text-muted">Priority:</span> 
+                                        <span class="badge bg-@(wo.Complaint?.Priority?.BadgeColor ?? "secondary")">
+                                            @(wo.Complaint?.Priority?.PriorityName ?? "Standard")
+                                        </span>
+                                    </div>
+
+                                    @if (wo.Status == WorkOrderStatus.ReworkRequired)
+                                    {
+                                        <div class="alert alert-danger py-1 small mb-3">
+                                            <i class="bi bi-exclamation-octagon-fill me-1"></i> <strong>Rework Mandated by Supervisor:</strong>
+                                            Please inspect supervisor defect notes and rectify.
+                                        </div>
+                                    }
+
+                                    <!-- Action Button based on status -->
+                                    <div class="d-grid gap-1 mt-auto">
+                                        @if (wo.Status == WorkOrderStatus.Assigned)
+                                        {
+                                            <button class="btn btn-sm btn-ums-primary" disabled>
+                                                <i class="bi bi-hand-thumbs-up me-1"></i> Task Acknowledged
+                                            </button>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.InProgress || wo.Status == WorkOrderStatus.ReworkRequired)
+                                        {
+                                            <a asp-area="Worker" asp-controller="Tasks" asp-action="Complete" asp-route-id="@wo.WorkOrderId" 
+                                               class="btn btn-sm btn-success">
+                                                <i class="bi bi-camera me-1"></i> Upload Evidence & Complete
+                                            </a>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.AwaitingVerification || wo.Status == WorkOrderStatus.WorkCompleted)
+                                        {
+                                            <button class="btn btn-sm btn-outline-warning" disabled>
+                                                <i class="bi bi-hourglass-split me-1"></i> In Inspection Queue
+                                            </button>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.VerifiedResolved)
+                                        {
+                                            <button class="btn btn-sm btn-outline-success" disabled>
+                                                <i class="bi bi-check-all me-1"></i> Quality Verified & Closed
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-top-0 pt-0 text-muted small" style="font-size: 0.75rem;">
+                                    Dispatched: @wo.AssignedAtUtc.ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

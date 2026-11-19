@@ -1,0 +1,198 @@
+@model SmartCampus.Web.Models.Entities.WorkOrder
+@{
+    ViewData["Title"] = $"Physical Inspection - {Model.WorkOrderNumber}";
+    var reporterImages = Model.Complaint?.Images?.ToList() ?? new List<SmartCampus.Web.Models.Entities.ComplaintImage>();
+    var technicianEvidence = Model.Evidence?.ToList() ?? new List<SmartCampus.Web.Models.Entities.WorkOrderEvidence>();
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-shield-check text-warning me-2"></i>Physical Inspection Console: @Model.WorkOrderNumber</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Verification Queue</a> &bull; Independent Physical Auditing
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Queue
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Side-by-Side Photo Comparison Card (The Core Differentiator) -->
+    <div class="ums-card p-4 mb-4">
+        <h5 class="fw-bold mb-3" style="color: #0f2b48;">
+            <i class="bi bi-images me-2"></i>Side-by-Side Photographic Quality Comparison
+        </h5>
+
+        <div class="row g-4">
+            <!-- Left: Problem Before Photos -->
+            <div class="col-md-6 border-end">
+                <div class="p-2 bg-light rounded mb-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-danger small">
+                        <i class="bi bi-exclamation-circle-fill me-1"></i> 1. Problem Reported (Before Repair)
+                    </span>
+                    <span class="badge bg-danger">Initial Evidence</span>
+                </div>
+                <div class="text-muted small mb-2">Submitted by: @(Model.Complaint?.ReporterUser?.Email?.Split('@')[0])</div>
+                
+                @if (!reporterImages.Any())
+                {
+                    <div class="p-4 bg-light text-center text-muted small rounded">
+                        No initial photographs were attached by reporter.
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var img in reporterImages)
+                        {
+                            <a href="@img.ImageUrl" target="_blank">
+                                <img src="@img.ImageUrl" alt="Before" class="img-thumbnail border-danger" 
+                                     style="width: 100%; max-height: 260px; object-fit: contain; background: #000;" />
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Right: Technician After Photos -->
+            <div class="col-md-6">
+                <div class="p-2 bg-light rounded mb-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-success small">
+                        <i class="bi bi-check-circle-fill me-1"></i> 2. Field Completion (After Repair)
+                    </span>
+                    <span class="badge bg-success">Technician Evidence</span>
+                </div>
+                <div class="text-muted small mb-2">
+                    Submitted by: @(Model.Assignments?.FirstOrDefault()?.WorkerUser?.Email?.Split('@')[0] ?? "Technician")
+                </div>
+
+                @if (!technicianEvidence.Any())
+                {
+                    <div class="p-4 bg-light text-center text-muted small rounded">
+                        No technician after-photos attached.
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var ev in technicianEvidence)
+                        {
+                            <a href="@ev.ImageUrl" target="_blank">
+                                <img src="@ev.ImageUrl" alt="After" class="img-thumbnail border-success" 
+                                     style="width: 100%; max-height: 260px; object-fit: contain; background: #000;" />
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="p-3 bg-light rounded border mt-4">
+            <h6 class="fw-bold text-dark small mb-1">Technician Repair Summary:</h6>
+            <p class="small text-secondary mb-0">@(Model.WorkSummary ?? "Technician reported repair completed on site.")</p>
+        </div>
+    </div>
+
+    <!-- Location & Decision Console -->
+    <div class="row g-4">
+        <!-- Location & Complaint Overview -->
+        <div class="col-lg-5">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> Inspection Location
+                </h6>
+                <div class="p-3 bg-light rounded border mb-3">
+                    <div class="fw-bold text-dark fs-6">@(Model.Complaint?.Location?.Floor?.Building?.BuildingCode) - @(Model.Complaint?.Location?.RoomNumber)</div>
+                    <div class="small text-muted">@(Model.Complaint?.Location?.Floor?.Building?.BuildingName) &bull; @(Model.Complaint?.Location?.Floor?.FloorName)</div>
+                </div>
+                <div class="small text-secondary mb-2">
+                    <strong>Complaint Title:</strong> @Model.Complaint?.Title
+                </div>
+                <div class="small text-secondary mb-2">
+                    <strong>Category:</strong> @Model.Complaint?.Category?.CategoryName
+                </div>
+                <div class="small text-secondary">
+                    <strong>Priority:</strong> 
+                    <span class="badge bg-@(Model.Complaint?.Priority?.BadgeColor ?? "secondary")">
+                        @(Model.Complaint?.Priority?.PriorityName)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inspection Sign-off / Rework Decision Form -->
+        <div class="col-lg-7">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;">
+                    <i class="bi bi-patch-check-fill text-success me-1"></i> Supervisor Inspection Decision
+                </h6>
+
+                <!-- Approval Form -->
+                <form asp-action="Approve" method="post" enctype="multipart/form-data" class="mb-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="workOrderId" value="@Model.WorkOrderId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-success">
+                            <i class="bi bi-check2-all me-1"></i> Physical Inspection Remarks (Approval)
+                        </label>
+                        <textarea name="inspectionNotes" class="form-control" rows="3" 
+                                  placeholder="Confirm that on-site physical inspection was completed, materials meet university standards, and the repair is safe and operational..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">
+                            <i class="bi bi-camera me-1"></i> Attach Verification Proof Photo (Optional)
+                        </label>
+                        <input type="file" name="verificationPhoto" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                        <i class="bi bi-patch-check-fill me-1"></i> Approve & Sign-Off Quality Verification
+                    </button>
+                </form>
+
+                <hr class="my-3 border-secondary opacity-25" />
+
+                <!-- Rework Section -->
+                <div>
+                    <button class="btn btn-outline-danger w-100 btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#reworkCollapse">
+                        <i class="bi bi-x-octagon-fill me-1"></i> Substandard Repair? Mandate Rework
+                    </button>
+
+                    <div class="collapse mt-3" id="reworkCollapse">
+                        <form asp-action="RejectRework" method="post" enctype="multipart/form-data" class="p-3 bg-light border border-danger rounded">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="workOrderId" value="@Model.WorkOrderId" />
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-danger">Defect Description & Rework Instructions</label>
+                                <textarea name="defectDescription" class="form-control form-control-sm" rows="3" 
+                                          placeholder="Specify exactly why the repair is rejected and what the technician must rectify..." required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted">Attach Defect Photo (Optional)</label>
+                                <input type="file" name="defectPhoto" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" />
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-sm w-100">
+                                Reject & Send Back to Technician for Rework
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,151 @@
+@{
+    ViewData["Title"] = "LPU Campus GIS Infrastructure Map";
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-map-fill me-2"></i>Interactive Campus GIS Infrastructure & Issue Map</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; 600-Acre Campus Geospatial Overview &bull; Live Maintenance Pins
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-danger p-2"><i class="bi bi-geo-alt-fill"></i> Critical / High Issues</span>
+            <span class="badge bg-warning text-dark p-2"><i class="bi bi-geo-alt-fill"></i> Medium / Low Issues</span>
+            <span class="badge bg-success p-2"><i class="bi bi-check-circle"></i> Optimal Facility</span>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    <div class="row g-4">
+        <!-- Map Canvas -->
+        <div class="col-lg-9">
+            <div class="ums-card p-0 shadow-sm overflow-hidden">
+                <div id="lpuCampusMap" style="height: 620px; width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Filter & Building List -->
+        <div class="col-lg-3">
+            <div class="ums-card">
+                <div class="ums-card-header bg-white">
+                    <span class="fw-bold"><i class="bi bi-funnel-fill me-2"></i>Campus Zones</span>
+                </div>
+                <div class="p-3">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Quick Navigate to Block</label>
+                        <select id="buildingSelector" class="form-select form-select-sm" onchange="panToBuilding(this.value)">
+                            <option value="">-- Select Campus Block --</option>
+                        </select>
+                    </div>
+
+                    <hr class="my-3 border-secondary opacity-25" />
+
+                    <h6 class="small fw-bold text-dark text-uppercase mb-2">Campus Reference Points</h6>
+                    <div id="buildingList" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center py-3 text-muted">Loading campus blocks...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let map;
+        let markersData = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Leaflet map centered at LPU Punjab coordinates
+            map = L.map('lpuCampusMap').setView([31.2536, 75.7037], 16);
+
+            // OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Lovely Professional University'
+            }).addTo(map);
+
+            // Fetch live campus building markers
+            fetch('/api/LocationApi/campus-markers')
+                .then(r => r.json())
+                .then(data => {
+                    markersData = data;
+                    populateBuildingSelector(data);
+                    renderMarkers(data);
+                })
+                .catch(err => console.error('Error fetching campus markers:', err));
+        });
+
+        function renderMarkers(buildings) {
+            const listContainer = document.getElementById('buildingList');
+            listContainer.innerHTML = '';
+
+            buildings.forEach(b => {
+                let badgeColor = 'bg-success';
+                let iconColor = 'green';
+                if (b.activeIssues > 2) {
+                    badgeColor = 'bg-danger';
+                    iconColor = 'red';
+                } else if (b.activeIssues > 0) {
+                    badgeColor = 'bg-warning text-dark';
+                    iconColor = 'orange';
+                }
+
+                // Add Leaflet Marker
+                const marker = L.marker([b.latitude, b.longitude]).addTo(map);
+                marker.bindPopup(`
+                    <div class="p-1">
+                        <div class="fw-bold font-monospace text-primary mb-1">${b.buildingCode}</div>
+                        <h6 class="fw-bold mb-1">${b.buildingName}</h6>
+                        <div class="small text-muted mb-2">Zone: ${b.zone}</div>
+                        <div class="mb-2">
+                            <span class="badge ${badgeColor}">${b.activeIssues} Active Issues</span>
+                        </div>
+                        <a href="/Reporter/Complaints/Create?buildingId=${b.buildingId}" class="btn btn-sm btn-ums-primary text-white w-100" style="font-size: 0.75rem;">
+                            Report Issue at this Block
+                        </a>
+                    </div>
+                `);
+
+                // Append to Sidebar List
+                const item = document.createElement('a');
+                item.href = 'javascript:void(0)';
+                item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2';
+                item.onclick = () => {
+                    map.setView([b.latitude, b.longitude], 18);
+                    marker.openPopup();
+                };
+                item.innerHTML = `
+                    <div>
+                        <strong>${b.buildingCode}</strong>
+                        <div class="text-muted text-truncate" style="max-width: 150px;">${b.buildingName}</div>
+                    </div>
+                    <span class="badge ${badgeColor} rounded-pill">${b.activeIssues}</span>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function populateBuildingSelector(buildings) {
+            const select = document.getElementById('buildingSelector');
+            buildings.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = `${b.latitude},${b.longitude}`;
+                opt.innerText = `${b.buildingCode} - ${b.buildingName}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function panToBuilding(coordString) {
+            if (!coordString) return;
+            const parts = coordString.split(',');
+            const lat = parseFloat(parts[0]);
+            const lng = parseFloat(parts[1]);
+            map.setView([lat, lng], 18);
+        }
+    </script>
+}

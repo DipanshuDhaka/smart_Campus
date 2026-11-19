@@ -1,0 +1,180 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.WorkOrderAssignment>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Technician Field Portal | My Tasks";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-tools text-warning me-2"></i>Technician Field Execution Desk</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Maintenance Squad &bull; Mobile Field Tasks
+            </div>
+        </div>
+        <a asp-area="Worker" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Field Hub
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @{
+        var squadOrders = ViewBag.SquadWorkOrders as IEnumerable<SmartCampus.Web.Models.Entities.WorkOrder>;
+    }
+
+    @if (squadOrders != null && squadOrders.Any())
+    {
+        <div class="ums-card mb-4 border border-warning shadow-sm">
+            <div class="ums-card-header bg-warning bg-opacity-10 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark">
+                    <i class="bi bi-broadcast text-warning me-2"></i>Available Trade Squad Work Orders (@squadOrders.Count() Open)
+                </span>
+                <span class="badge bg-warning text-dark">Open for Claim</span>
+            </div>
+            <div class="p-3">
+                <div class="row g-3">
+                    @foreach (var sq in squadOrders)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 border-warning border-opacity-50 shadow-sm">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                                    <span class="font-monospace fw-bold text-primary small">@sq.WorkOrderNumber</span>
+                                    <span class="badge bg-@(sq.Complaint?.Priority?.BadgeColor ?? "secondary")" style="font-size: 0.65rem;">
+                                        @(sq.Complaint?.Priority?.PriorityName ?? "Standard")
+                                    </span>
+                                </div>
+                                <div class="card-body p-3">
+                                    <h6 class="fw-bold text-dark mb-1">@(sq.Complaint?.Title)</h6>
+                                    <div class="small text-muted mb-2">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        @(sq.Complaint?.Location?.Floor?.Building?.BuildingCode) &bull; @(sq.Complaint?.Location?.RoomNumber)
+                                    </div>
+                                    <div class="small text-secondary mb-3">
+                                        Trade Squad: <strong>@(sq.Team?.TeamName ?? sq.Department?.DepartmentName)</strong>
+                                    </div>
+                                    <form asp-action="Claim" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="workOrderId" value="@sq.WorkOrderId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-warning text-dark fw-bold w-100">
+                                            <i class="bi bi-hand-index-thumb me-1"></i> Claim & Accept Task
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-card-checklist me-2"></i>My Field Assignments (@Model.Count() Tasks)</span>
+            <span class="badge bg-secondary">Real-Time Dispatch</span>
+        </div>
+        <div class="p-3">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-check2-circle text-success fs-1 d-block mb-2"></i>
+                    No pending tasks assigned to you. You are on standby.
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var a in Model)
+                    {
+                        var wo = a.WorkOrder;
+                        if (wo == null) continue;
+
+                        string cardBorder = wo.Status == WorkOrderStatus.ReworkRequired ? "border-danger" : 
+                                            wo.Status == WorkOrderStatus.InProgress ? "border-warning" : "border-secondary";
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border @cardBorder">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold font-monospace text-primary small">@wo.WorkOrderNumber</span>
+                                    <span class="badge bg-dark">@wo.Status</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-dark mb-1">@(wo.Complaint?.Title)</h6>
+                                    <div class="small text-muted mb-2">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        <strong>@(wo.Complaint?.Location?.Floor?.Building?.BuildingCode)</strong> &bull; 
+                                        @(wo.Complaint?.Location?.RoomNumber) (@(wo.Complaint?.Location?.Floor?.FloorName))
+                                    </div>
+                                    <p class="small text-secondary mb-3 text-truncate" style="max-width: 100%;">
+                                        @(wo.Complaint?.Description)
+                                    </p>
+
+                                    @if (wo.Status == WorkOrderStatus.ReworkRequired)
+                                    {
+                                        <div class="alert alert-danger py-1 small mb-3">
+                                            <i class="bi bi-exclamation-octagon-fill me-1"></i> <strong>Rework Mandated:</strong>
+                                            Supervisor inspection rejected previous repair. Rectification required.
+                                        </div>
+                                    }
+
+                                    <!-- Lifecycle Actions -->
+                                    <div class="d-grid gap-1 mt-auto">
+                                        @if (wo.Status == WorkOrderStatus.Assigned)
+                                        {
+                                            <form asp-action="Accept" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="workOrderId" value="@wo.WorkOrderId" />
+                                                <button type="submit" class="btn btn-sm btn-ums-primary w-100">
+                                                    <i class="bi bi-check-lg me-1"></i> Accept Task
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.WorkAccepted)
+                                        {
+                                            <form asp-action="StartWork" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="workOrderId" value="@wo.WorkOrderId" />
+                                                <button type="submit" class="btn btn-sm btn-warning w-100 text-dark fw-bold">
+                                                    <i class="bi bi-play-fill me-1"></i> Start On-Site Work
+                                                </button>
+                                            </form>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.InProgress || wo.Status == WorkOrderStatus.ReworkRequired)
+                                        {
+                                            <a asp-action="Complete" asp-route-id="@wo.WorkOrderId" class="btn btn-sm btn-success fw-bold">
+                                                <i class="bi bi-camera-fill me-1"></i> Upload Photos & Submit Repair
+                                            </a>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.AwaitingVerification)
+                                        {
+                                            <button class="btn btn-sm btn-outline-warning" disabled>
+                                                <i class="bi bi-hourglass-split me-1"></i> In Inspection Queue
+                                            </button>
+                                        }
+                                        else if (wo.Status == WorkOrderStatus.VerifiedResolved)
+                                        {
+                                            <button class="btn btn-sm btn-outline-success" disabled>
+                                                <i class="bi bi-patch-check-fill me-1"></i> Quality Verified & Closed
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-top-0 pt-0 text-muted small" style="font-size: 0.75rem;">
+                                    Dispatched: @wo.AssignedAtUtc.ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

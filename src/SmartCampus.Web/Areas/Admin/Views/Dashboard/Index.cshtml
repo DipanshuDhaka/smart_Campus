@@ -1,0 +1,218 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.Complaint>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Campus Control Desk Dashboard";
+    var departments = ViewBag.Departments as IEnumerable<SmartCampus.Web.Models.Entities.Department>;
+}
+
+<!-- Page Header Ribbon -->
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-speedometer2 me-2"></i>Campus Control Desk & Triage Console</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Control Operations Hub &bull; 600+ Acres Estate
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="Admin" asp-controller="Triage" asp-action="Index" class="btn btn-ums-orange btn-sm">
+                <i class="bi bi-inbox-fill me-1"></i> Open Triage Queue (@ViewBag.PendingTriage)
+            </a>
+            <a asp-area="" asp-controller="Home" asp-action="CampusMap" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-map me-1"></i> Live Issue Map
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <!-- Stat Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Admin" asp-controller="Triage" asp-action="Index" class="text-decoration-none">
+                <div class="ums-stat-card">
+                    <div class="ums-stat-number">@ViewBag.TotalComplaints</div>
+                    <div class="ums-stat-label">Total Logged</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Admin" asp-controller="Triage" asp-action="Index" asp-route-statusFilter="Submitted" class="text-decoration-none">
+                <div class="ums-stat-card stat-warning">
+                    <div class="ums-stat-number text-warning">@ViewBag.PendingTriage</div>
+                    <div class="ums-stat-label">Pending Triage</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Supervisor" asp-controller="WorkOrders" asp-action="Index" class="text-decoration-none">
+                <div class="ums-stat-card stat-teal">
+                    <div class="ums-stat-number" style="color: #0d9488;">@ViewBag.ActiveWorkOrders</div>
+                    <div class="ums-stat-label">Active Work Orders</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Supervisor" asp-controller="Verification" asp-action="Index" class="text-decoration-none">
+                <div class="ums-stat-card stat-warning">
+                    <div class="ums-stat-number text-warning">@ViewBag.AwaitingVerification</div>
+                    <div class="ums-stat-label">Verification Gate</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Admin" asp-controller="SLAMonitor" asp-action="Index" class="text-decoration-none">
+                <div class="ums-stat-card stat-danger">
+                    <div class="ums-stat-number text-danger">@ViewBag.OverdueBreaches</div>
+                    <div class="ums-stat-label">Overdue SLA</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+            <a asp-area="Admin" asp-controller="Analytics" asp-action="Index" class="text-decoration-none">
+                <div class="ums-stat-card stat-success">
+                    <div class="ums-stat-number text-success">@ViewBag.ResolvedCount</div>
+                    <div class="ums-stat-label">Quality Verified</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Triage Queue Column -->
+        <div class="col-lg-9">
+            <div class="ums-card">
+                <div class="ums-card-header">
+                    <span><i class="bi bi-list-task me-2"></i>Incoming Maintenance Tickets (Live Queue)</span>
+                    <span class="badge bg-secondary">Real-Time Feed</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table ums-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Issue / Title</th>
+                                <th>Campus Location</th>
+                                <th>Category</th>
+                                <th>Priority / SLA</th>
+                                <th>Lifecycle Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
+                                        No pending complaints in queue. Campus infrastructure is operating optimally.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    string badgeClass = item.Status switch
+                                    {
+                                        ComplaintStatus.Submitted => "badge-submitted",
+                                        ComplaintStatus.UnderReview => "badge-under-review",
+                                        ComplaintStatus.Assigned => "badge-assigned",
+                                        ComplaintStatus.WorkAccepted => "badge-work-accepted",
+                                        ComplaintStatus.InProgress => "badge-in-progress",
+                                        ComplaintStatus.WorkCompleted => "badge-work-completed",
+                                        ComplaintStatus.AwaitingVerification => "badge-awaiting-verification",
+                                        ComplaintStatus.VerifiedResolved => "badge-verified-resolved",
+                                        ComplaintStatus.ReworkRequired => "badge-rework-required",
+                                        ComplaintStatus.Closed => "badge-closed",
+                                        _ => "badge-rejected"
+                                    };
+
+                                    <tr>
+                                        <td class="fw-bold font-monospace small">@item.TicketNumber</td>
+                                        <td>
+                                            <div class="fw-semibold text-dark">@item.Title</div>
+                                            <small class="text-muted">By: @(item.ReporterUser?.Email?.Split('@')[0] ?? "Reporter") &bull; @item.CreatedAtUtc.ToString("dd MMM, hh:mm tt")</small>
+                                        </td>
+                                        <td class="small">
+                                            <span class="fw-semibold">@(item.Location?.Floor?.Building?.BuildingCode ?? "LPU")</span>
+                                            <div class="text-muted">@(item.Location?.RoomNumber ?? "General Area") (@(item.Location?.Floor?.FloorName ?? "Ground"))</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                <i class="bi @(item.Category?.IconCssClass ?? "bi-tools") me-1"></i>
+                                                @(item.Category?.CategoryName ?? "General")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (item.Priority != null)
+                                            {
+                                                <span class="badge bg-@item.Priority.BadgeColor">@item.Priority.PriorityName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Unassigned</span>
+                                            }
+                                            @if (item.IsOverdue)
+                                            {
+                                                <span class="badge bg-danger ms-1"><i class="bi bi-clock-history"></i> Overdue</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge-status @badgeClass">@item.Status</span>
+                                        </td>
+                                        <td>
+                                            <a asp-area="Admin" asp-controller="Triage" asp-action="Review" asp-route-id="@item.ComplaintId" class="btn btn-sm btn-ums-primary">
+                                                <i class="bi bi-pencil-square me-1"></i> Review & Assign
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Department Load Status -->
+        <div class="col-lg-3">
+            <div class="ums-card">
+                <div class="ums-card-header">
+                    <span><i class="bi bi-pie-chart-fill me-2"></i>Department Load</span>
+                </div>
+                <div class="p-3">
+                    @if (departments != null)
+                    {
+                        foreach (var dept in departments)
+                        {
+                            var activeOrders = dept.WorkOrders?.Count(w => w.Status != WorkOrderStatus.VerifiedResolved) ?? 0;
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>@dept.DepartmentName</span>
+                                    <span class="badge bg-light text-dark border">@activeOrders Active</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: @(Math.Min(activeOrders * 15, 100))%;"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Verification Principle Reminder -->
+            <div class="ums-card border-warning">
+                <div class="p-3 bg-light">
+                    <div class="fw-bold text-dark small mb-1">
+                        <i class="bi bi-shield-lock-fill text-warning me-1"></i> Independent Verification Rule
+                    </div>
+                    <p class="small text-muted mb-0" style="font-size: 0.8rem;">
+                        Work Completed &ne; Resolved. Every repair must be independently inspected by the Department Supervisor before closing. Workers cannot self-approve.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

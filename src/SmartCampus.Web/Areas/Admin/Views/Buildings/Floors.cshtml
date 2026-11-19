@@ -1,0 +1,102 @@
+@model SmartCampus.Web.Models.Entities.Building
+@{
+    ViewData["Title"] = $"Floors - {Model.BuildingCode}";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-layers me-2"></i>@Model.BuildingCode — @Model.BuildingName</h4>
+            <div class="ums-breadcrumb text-muted">
+                <a asp-action="Index" class="text-decoration-none">Buildings</a> &bull; Floor Hierarchy
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Buildings
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Add Floor Form -->
+        <div class="col-md-4">
+            <div class="ums-card p-4">
+                <h6 class="fw-bold mb-3" style="color: #0f2b48;"><i class="bi bi-plus-circle me-1"></i> Add Floor Level</h6>
+                <form asp-action="AddFloor" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="buildingId" value="@Model.BuildingId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Floor Number</label>
+                        <input type="number" name="floorNumber" class="form-control" value="1" min="-2" max="25" required />
+                        <small class="text-muted" style="font-size: 0.72rem;">0 = Ground Floor, -1 = Basement</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Floor Display Name</label>
+                        <input type="text" name="floorName" class="form-control" placeholder="e.g. 2nd Floor (Computing Wing)" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-ums-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i> Create Floor Level
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Floors List -->
+        <div class="col-md-8">
+            <div class="ums-card">
+                <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="bi bi-list-nested me-2"></i>Configured Floors (@Model.Floors.Count Levels)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table ums-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Level #</th>
+                                <th>Floor Name</th>
+                                <th>Total Rooms</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Floors.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No floors configured yet.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var floor in Model.Floors.OrderBy(f => f.FloorNumber))
+                                {
+                                    <tr>
+                                        <td class="fw-bold font-monospace">@floor.FloorNumber</td>
+                                        <td class="fw-semibold">@floor.FloorName</td>
+                                        <td>
+                                            <span class="badge bg-info text-dark">@floor.Locations.Count Locations</span>
+                                        </td>
+                                        <td>
+                                            <a asp-action="Locations" asp-route-floorId="@floor.FloorId" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-geo-alt me-1"></i> Manage Rooms & QR Codes
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

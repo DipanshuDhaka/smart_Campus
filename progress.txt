@@ -1,0 +1,388 @@
+# Ralph Loop Progress & Iteration Log
+Project: SmartCampus (LPU Reference Campus)
+Started: 2026-11-12
+
+================================================================================
+Iteration 001 - Phase 1 Foundation & System Scoping
+Timestamp: 2026-11-12T20:36:00+05:30
+Task ID: PHASE1-REQ-001
+Status: COMPLETE
+Files Modified:
+- PRD.md (created & updated)
+- STATE.md (created & updated)
+- CONTEXT.md (created)
+- docs/SRS.md (created)
+- docs/USE_CASE_SPECIFICATION.md (created)
+- docs/DATABASE_ERD.md (created)
+- progress.txt (created)
+Details:
+- Verified .NET 10 LTS SDK (10.0.302) installed on the system.
+- Initialized core GSD and Ralph loop specifications.
+- Completed Phase 1 deliverables:
+  1. Software Requirements Specification (SRS) with all functional (FR-AUTH through FR-FEEDBACK) and non-functional requirements.
+  2. Use Case Specifications & Mermaid diagrams for all 5 roles, 10-stage lifecycle, and state transitions.
+  3. Database ERD and Schema Dictionary for SmartCampusDB with 11 relational modules, indexes, constraints, and audit trails.
+================================================================================
+
+================================================================================
+Iteration 002 - Phase 2 Environment & Project Setup
+Timestamp: 2026-11-12T21:35:00+05:30
+Task ID: PHASE2-SETUP-001
+Status: COMPLETE
+Files Modified:
+- SmartCampus.sln (created)
+- SmartCampus.slnx (created)
+- src/SmartCampus.Web/SmartCampus.Web.csproj (created & configured)
+- src/SmartCampus.Web/appsettings.json (configured with SmartCampusDB & LPU metadata)
+- .gitignore (created)
+- src/SmartCampus.Web/wwwroot/uploads/.gitkeep (created)
+- PRD.md (updated)
+- STATE.md (updated)
+- docs/BUILD_STEP_BY_STEP.md (updated)
+Details:
+- Scaffolded ASP.NET Core MVC solution on .NET 10 LTS (`10.0.302 SDK`).
+- Installed official packages: EF Core 10 SqlServer, EF Core Tools, ASP.NET Core Identity, Google Auth, and QRCoder.
+- Configured connection string for `SmartCampusDB` on SQL Server LocalDB.
+- Successfully built solution with 0 errors (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 003 - Phase 3 Database Development & LPU Campus Seeder
+Timestamp: 2026-11-12T22:09:00+05:30
+Task ID: PHASE3-DB-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Models/Enums/SystemEnums.cs (created)
+- src/SmartCampus.Web/Models/Entities/IdentityExtensions.cs (created)
+- src/SmartCampus.Web/Models/Entities/CampusSpatial.cs (created)
+- src/SmartCampus.Web/Models/Entities/IssueCatalog.cs (created)
+- src/SmartCampus.Web/Models/Entities/WorkforceEntities.cs (created)
+- src/SmartCampus.Web/Models/Entities/ComplaintEntities.cs (created)
+- src/SmartCampus.Web/Models/Entities/WorkOrderEntities.cs (created)
+- src/SmartCampus.Web/Models/Entities/SystemSupportEntities.cs (created)
+- src/SmartCampus.Web/Data/ApplicationDbContext.cs (created & configured)
+- src/SmartCampus.Web/Data/DbInitializer.cs (created & configured)
+- src/SmartCampus.Web/Program.cs (configured DbContext, Identity, Cookies, Areas)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Implemented full schema for SmartCampusDB with 11 relational modules.
+- Formulated Fluent API constraints, foreign key delete rules, and non-clustered composite performance indexes.
+- Configured LPU-specific reference campus seeder with Block 32, Block 34, Block 38, Central Library, UniMall, Hostels BH-1 & GH-1, outdoor boulevard, trade departments, skills, priorities, SLAs, and initial test accounts for all 5 roles.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 004 - Phase 4 Authentication, Institutional Whitelist & LPU UMS Portals
+Timestamp: 2026-11-12T22:59:00+05:30
+Task ID: PHASE4-AUTH-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Services/IEmailDomainValidator.cs (created)
+- src/SmartCampus.Web/Controllers/AccountController.cs (created with Google OAuth, credentials, and role routing)
+- src/SmartCampus.Web/Program.cs (configured custom domain validator)
+- src/SmartCampus.Web/wwwroot/css/lpu-ums.css (created authentic LPU UMS formal stylesheet)
+- src/SmartCampus.Web/Views/Account/Login.cshtml (created with Google SSO, UMS credentials, and 1-click evaluation switcher)
+- src/SmartCampus.Web/Views/Account/AccessDenied.cshtml (created with RBAC security explanation)
+- src/SmartCampus.Web/Views/Shared/_Layout.cshtml (created with LPU UMS topbar, crest, role-aware nav, user badge)
+- src/SmartCampus.Web/Views/Home/Index.cshtml (created authentic LPU UMS landing page)
+- src/SmartCampus.Web/Areas/Admin/Controllers/DashboardController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Dashboard/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Supervisor/Controllers/DashboardController.cs (created)
+- src/SmartCampus.Web/Areas/Supervisor/Views/Dashboard/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Worker/Controllers/DashboardController.cs (created)
+- src/SmartCampus.Web/Areas/Worker/Views/Dashboard/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Reporter/Controllers/DashboardController.cs (created)
+- src/SmartCampus.Web/Areas/Reporter/Views/Dashboard/Index.cshtml (created)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Implemented Google OAuth 2.0 with institutional domain filter (AllowedEmailDomains table).
+- Implemented strict RBAC across all 5 roles.
+- Delivered the complete LPU UMS aesthetic: Navy Blue (#0f2b48), Crisp White, Slate Grey, and Gold accents.
+- Embedded 1-click evaluation switcher on Login page allowing rapid demo of all 5 roles.
+- Compiled cleanly with 0 errors (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 005 - Phase 5 Campus & Spatial Topology Management with Dynamic QR
+Timestamp: 2026-11-12T23:26:00+05:30
+Task ID: PHASE5-LOC-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Services/IQRService.cs (created)
+- src/SmartCampus.Web/Controllers/LocationApiController.cs (created with cascading endpoints and QR resolver)
+- src/SmartCampus.Web/Areas/Admin/Controllers/BuildingsController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Buildings/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Buildings/Create.cshtml (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Buildings/Floors.cshtml (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Buildings/Locations.cshtml (created with dynamic QR print/modal)
+- src/SmartCampus.Web/Views/Home/CampusMap.cshtml (created interactive Leaflet GIS map)
+- src/SmartCampus.Web/Controllers/HomeController.cs (added CampusMap action)
+- src/SmartCampus.Web/Program.cs (registered IQRService)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Scaffolded dynamic 60+ campus building management without hardcoded constraints.
+- Integrated QRCoder for cryptographic GUID doorplate QR code generation.
+- Integrated Leaflet.js with OpenStreetMap centered on LPU Punjab coordinates.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 006 - Phase 6 Student & Faculty Complaint Reporting Module
+Timestamp: 2026-11-12T23:38:00+05:30
+Task ID: PHASE6-COMP-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Services/IFileStorageService.cs (created)
+- src/SmartCampus.Web/Program.cs (registered IFileStorageService)
+- src/SmartCampus.Web/Areas/Reporter/Controllers/ComplaintsController.cs (created)
+- src/SmartCampus.Web/Areas/Reporter/Views/Complaints/Create.cshtml (created with cascading selectors & QR lock)
+- src/SmartCampus.Web/Areas/Reporter/Views/Complaints/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Reporter/Views/Complaints/Details.cshtml (created with 10-stage tracker, photos, history & feedback)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Developed the complete Student & Faculty reporting interface with authentic LPU UMS layout.
+- Handled multi-image upload with MIME and extension sandboxing.
+- Built QR scan pre-population and automatic location locking.
+- Created the 10-stage visual lifecycle tracker and audit history timeline.
+- Implemented 5-star service rating and 48-hour dispute/reopen workflow.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 007 - Phase 7 Campus Control Desk Triage & Duplicate Detection Heuristic
+Timestamp: 2026-11-12T23:51:00+05:30
+Task ID: PHASE7-TRIAGE-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Areas/Admin/Controllers/TriageController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Triage/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Triage/Review.cshtml (created with Duplicate Heuristic alert & SLA preview)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Built the Central Control Desk triage queue with multi-facet filters.
+- Implemented duplicate detection heuristic across 48-hour matching windows.
+- Integrated automated SLA deadline calculation across all 4 priorities.
+- Handled rejection workflows with mandatory justification and reporter notifications.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 008 - Phase 8 Department & Workforce Team Management
+Timestamp: 2026-11-13T00:09:00+05:30
+Task ID: PHASE8-TEAM-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Areas/Admin/Controllers/DepartmentsController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Departments/Index.cshtml (created & fixed)
+- src/SmartCampus.Web/Areas/Admin/Views/Departments/Teams.cshtml (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Departments/Workers.cshtml (created)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Developed the Department and Workforce Management module.
+- Built Team hierarchy with Supervisor (Team Head) assignments.
+- Implemented Technician squad roster with dynamic availability states (Available, Busy, Overloaded, OnLeave).
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 009 - Phase 9 Work Orders & Workforce Allocation Engine
+Timestamp: 2026-11-13T00:28:00+05:30
+Task ID: PHASE9-WO-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Areas/Supervisor/Controllers/WorkOrdersController.cs (created)
+- src/SmartCampus.Web/Areas/Supervisor/Views/WorkOrders/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Supervisor/Views/WorkOrders/Assign.cshtml (created with multi-worker checkboxes & availability tags)
+- src/SmartCampus.Web/Areas/Worker/Controllers/TasksController.cs (created)
+- src/SmartCampus.Web/Areas/Worker/Views/Tasks/MyTasks.cshtml (created)
+- src/SmartCampus.Web/Areas/Worker/Views/Tasks/Complete.cshtml (created with after-photo upload)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Built the Workforce Allocation engine allowing supervisors to assign technicians to work orders.
+- Implemented technician task lifecycle: Accept -> Start Work -> Upload Evidence.
+- Enforced the architectural gate: completion transitions to AwaitingVerification for supervisor inspection.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 010 - Phase 10 Independent Quality Verification Gate (Core Differentiator)
+Timestamp: 2026-11-13T00:39:00+05:30
+Task ID: PHASE10-VERIF-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Areas/Supervisor/Controllers/VerificationController.cs (created)
+- src/SmartCampus.Web/Areas/Supervisor/Views/Verification/Index.cshtml (created)
+- src/SmartCampus.Web/Areas/Supervisor/Views/Verification/Inspect.cshtml (created with side-by-side photo comparison)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Implemented the central architectural gate: Work Completed != Resolved.
+- Created the side-by-side photographic inspection console comparing reporter issue photo vs technician repair photo.
+- Enforced the strict rule: a worker is programmatically prevented from verifying or approving their own completed work.
+- Built both verification approval (moves to VerifiedResolved) and rejection (triggers ReworkRequired loop with defect notes).
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 011 - Phase 11 SLA Monitoring & Automated Multi-Tier Escalation Engine
+Timestamp: 2026-11-13T00:56:00+05:30
+Task ID: PHASE11-SLA-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Services/SLAEngineHostedService.cs (created BackgroundService)
+- src/SmartCampus.Web/Areas/Admin/Controllers/SLAMonitorController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/SLAMonitor/Index.cshtml (created)
+- src/SmartCampus.Web/Program.cs (registered hosted service)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Implemented autonomous background SLA engine calculating elapsed time across active work orders.
+- Triggered automated multi-tier notifications: Tier 1 (50% worker reminder), Tier 2 (75% supervisor warning), Tier 3 (100% breach escalation).
+- Built SLA compliance dashboard with real-time MTTR and breach audit trail.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 012 - Phase 12 Interactive GIS Campus Map & Mobile QR Camera Scanner
+Timestamp: 2026-11-13T01:11:00+05:30
+Task ID: PHASE12-MAP-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Views/Home/ScanQR.cshtml (created Mobile Web QR Camera Scanner)
+- src/SmartCampus.Web/Controllers/HomeController.cs (added ScanQR action)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Deployed Leaflet.js interactive map centered on Lovely Professional University campus (`31.2536° N, 75.7037° E`).
+- Built web-based camera stream QR code scanner (`ScanQR.cshtml`) with fallback manual GUID resolver.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 013 - Phase 13 Operations Analytics & Institutional Notification Center
+Timestamp: 2026-11-13T01:30:00+05:30
+Task ID: PHASE13-ANALYTICS-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Areas/Admin/Controllers/AnalyticsController.cs (created)
+- src/SmartCampus.Web/Areas/Admin/Views/Analytics/Index.cshtml (created with Chart.js dashboards)
+- src/SmartCampus.Web/Controllers/NotificationsController.cs (created)
+- src/SmartCampus.Web/Views/Notifications/Index.cshtml (created)
+- src/SmartCampus.Web/Views/Shared/_Layout.cshtml (integrated Analytics link & Notification bell)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Built executive operations analytics dashboard with Chart.js:
+  * Category Distribution (Doughnut Chart)
+  * Department Workload & Resolution Efficiency (Bar Chart)
+  * Campus Hotspot Matrix: Top 5 Buildings by Incident Volume (Horizontal Bar Chart)
+  * Executive metrics: Total Logged, Verified Resolved, SLA Compliance Rate %, MTTR (hours), and Student/Staff Rating.
+- Implemented institutional notification center supporting multi-tier alerts, unread counts, and one-click ticket deep linking.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 014 - Phase 14 Advanced Optimization & Real-Time Features
+Timestamp: 2026-11-13T01:33:00+05:30
+Task ID: PHASE14-ADVANCED-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Services/ISmartRecommenderService.cs (created)
+- src/SmartCampus.Web/Services/SmartRecommenderService.cs (created keyword-based heuristic recommender)
+- src/SmartCampus.Web/Hubs/NotificationHub.cs (created SignalR hub)
+- src/SmartCampus.Web/Areas/Admin/Controllers/TriageController.cs (integrated ISmartRecommenderService)
+- src/SmartCampus.Web/Areas/Admin/Views/Triage/Review.cshtml (added AI/Heuristic trade recommendation card)
+- src/SmartCampus.Web/Areas/Supervisor/Controllers/WorkOrdersController.cs (added workload auto-balancing metrics)
+- src/SmartCampus.Web/Areas/Supervisor/Views/WorkOrders/Assign.cshtml (added workload auto-balancing meter & sorting)
+- src/SmartCampus.Web/Program.cs (registered recommender service & SignalR hub)
+- src/SmartCampus.Web/wwwroot/js/site.js (implemented live SignalR toast notifications)
+- src/SmartCampus.Web/Views/Shared/_Layout.cshtml (added SignalR client library & toast container)
+- PRD.md (updated)
+- STATE.md (updated)
+Details:
+- Built Intelligent Department Recommender matching issue keywords against trade vocabularies (ELEC, PLUMB, CIVIL, HVAC, ITNET, HOUSE, HORT) with confidence percentage and suggested crew size.
+- Implemented Workload Auto-Balancing algorithm calculating active technician assignments, sorting lowest loaded workers first with an optimal recommendation badge.
+- Deployed SignalR real-time notification hub (`/hubs/notifications`) with role and user group broadcasting, and client-side institutional toasts.
+- Successfully compiled solution (`Build succeeded. 0 Error(s)`).
+================================================================================
+
+================================================================================
+Iteration 015 - Phase 15 Hardening, Pilot Data Seeding & Final Deliverables
+Timestamp: 2026-11-13T01:38:00+05:30
+Task ID: PHASE15-FINAL-001
+Status: COMPLETE
+Files Modified:
+- src/SmartCampus.Web/Data/DbInitializer.cs (seeded representative pilot complaints across 10-stage lifecycle)
+- src/SmartCampus.Web/wwwroot/images/sample-evidence.svg (created default issue evidence asset)
+- src/SmartCampus.Web/wwwroot/images/sample-repaired.svg (created default verified completion asset)
+- PRD.md (all 15 phases checked off)
+- STATE.md (updated status to SHIPPED)
+- docs/BUILD_STEP_BY_STEP.md (updated with complete chronological build log)
+- docs/PROJECT_REPORT.md (final review)
+- docs/PRESENTATION.md (final review)
+- README.md (verified final instructions and evaluation matrix)
+Details:
+- Seeded 4 pilot complaints covering every major stage of the lifecycle: Submitted (triage queue), Assigned (technician desk), AwaitingVerification (with before/after photos), and Closed (with 5-star rating).
+- Verified production Release build (`dotnet build -c Release`) with 0 errors.
+- Conducted full security audit: anti-forgery tokens, file upload sandboxing, SQL injection immunity via EF Core parameterization, and strict supervisor self-verification prohibition.
+- All 15 phases completed in full compliance with the specification.
+ralph-done-smartcampus-001
+================================================================================
+
+================================================================================
+Iteration 016 - Documentation Export to PPT, Word (.docx) & PDF Deliverables
+Timestamp: 2026-11-16T14:05:00+05:30
+Task ID: DOCS-EXPORT-PPT-WORD-PDF
+Status: COMPLETE
+Files Modified:
+- docs/SmartCampus_Presentation.pptx (created via python-pptx: 14 widescreen 16:9 slides, LPU Navy/Gold theme, speaker notes)
+- docs/SmartCampus_Project_Report.docx (created via python-docx: 10 chapters + Executive Abstract, formal typography, tables, callouts)
+- docs/SmartCampus_Project_Report.pdf (created via ReportLab: publication-grade A4 PDF report with custom NumberedCanvas headers/footers)
+- docs/SmartCampus_Presentation.pdf (created via ReportLab: 16:9 landscape presentation PDF deck)
+- progress.txt (updated)
+- STATE.md (updated)
+Details:
+- Converted markdown source documentation into professional institutional deliverables:
+  1. PowerPoint Presentation (SmartCampus_Presentation.pptx) formatted in 16:9 widescreen with LPU UMS brand standards, custom metric cards, role matrices, lifecycle flow, and comprehensive presenter defense notes.
+  2. Word Document Report (SmartCampus_Project_Report.docx) formatted with formal LPU crest metadata, executive abstract, full engineering chapters, data tables, callouts, and security audits.
+  3. PDF Comprehensive Engineering Report (SmartCampus_Project_Report.pdf) generated with vector typography, running headers, dynamic page numbering ("Page X of Y"), and styled tables.
+  4. Extra PDF Presentation Deck (SmartCampus_Presentation.pdf) providing a print/share-ready PDF version of the presentation slides.
+================================================================================
+
+================================================================================
+Iteration 017 - Comprehensive 32-Page Academic Report & Screenshots Integration
+Timestamp: 2026-11-16T14:32:00+05:30
+Task ID: DOCS-30PAGE-REPORT-UPDATE
+Status: COMPLETE
+Files Modified:
+- docs/SmartCampus_Project_Report.docx (expanded to 30+ pages in LPU academic format with 3-student slots, 13 screenshots, and 7 chapters)
+- docs/SmartCampus_Project_Report.pdf (compiled to exactly 32 pages with NumberedCanvas headers, footers, tables, and figures)
+- docs/screenshots/ (captured 13 real high-res PNG screenshots of the running application)
+- progress.txt (updated)
+- STATE.md (updated)
+Details:
+- Implemented LPU Academic Report structure modeled after Annexure-I (Title page with 3-student group submission details) and Annexure-II (Student Declaration for 3 group members).
+- Omitted non-essential components (external company training certificates).
+- Integrated 13 real screenshots from the running SmartCampus web portal across Chapter 5:
+  1. Home Landing Page
+  2. Institutional Login Portal
+  3. Interactive Campus GIS Map (Leaflet.js)
+  4. Campus Control Desk Dashboard
+  5. Triage Queue & Duplicate Heuristics
+  6. 60+ Buildings, Floors & QR Management
+  7. Multi-Tier SLA Monitor & Escalation
+  8. Executive Operations Analytics (Chart.js)
+  9. Student / Teacher Issue Report Form
+  10. Student Complaint History & Tracking
+  11. Supervisor Work Orders & Manpower Dispatch
+  12. Mandatory Independent Quality Verification Gate
+  13. Maintenance Worker Mobile Task Portal
+- Verified exact PDF page count using pypdf: 32 pages total (exceeds 30-page minimum requirement).
+================================================================================

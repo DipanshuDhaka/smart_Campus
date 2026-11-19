@@ -1,0 +1,102 @@
+@model IEnumerable<SmartCampus.Web.Models.Entities.WorkOrder>
+@using SmartCampus.Web.Models.Enums
+@{
+    ViewData["Title"] = "Department Work Orders";
+}
+
+<div class="ums-page-header">
+    <div class="container-fluid px-lg-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="ums-page-title"><i class="bi bi-clipboard2-data-fill text-warning me-2"></i>Department Trade Work Orders</h4>
+            <div class="ums-breadcrumb text-muted">
+                Lovely Professional University &bull; Trade Squad Management &bull; Field Dispatch
+            </div>
+        </div>
+        <a asp-area="Supervisor" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-speedometer2 me-1"></i> Supervisor Hub
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 mb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="ums-card">
+        <div class="ums-card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold"><i class="bi bi-wrench-adjustable me-2"></i>Dispatched Work Orders (@Model.Count())</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table ums-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Work Order #</th>
+                        <th>Parent Ticket</th>
+                        <th>Location</th>
+                        <th>Department</th>
+                        <th>Assigned Squad / Technicians</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">No active work orders dispatched to this department.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var wo in Model)
+                        {
+                            var workers = wo.Assignments?.Select(a => a.WorkerUser?.Email?.Split('@')[0]).ToList();
+
+                            <tr>
+                                <td class="fw-bold font-monospace text-primary">@wo.WorkOrderNumber</td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@(wo.Complaint?.Title)</div>
+                                    <small class="text-muted font-monospace">@wo.Complaint?.TicketNumber</small>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@(wo.Complaint?.Location?.Floor?.Building?.BuildingCode)</div>
+                                    <small class="text-muted">@(wo.Complaint?.Location?.RoomNumber) (@(wo.Complaint?.Location?.Floor?.FloorName))</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@wo.Department?.DepartmentCode</span>
+                                </td>
+                                <td>
+                                    @if (workers != null && workers.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach (var w in workers)
+                                            {
+                                                <span class="badge bg-info text-dark">@w</span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Unassigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">@wo.Status</span>
+                                </td>
+                                <td>
+                                    <a asp-action="Assign" asp-route-id="@wo.WorkOrderId" class="btn btn-sm btn-ums-primary">
+                                        <i class="bi bi-person-gear me-1"></i> Allocate Squad
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
