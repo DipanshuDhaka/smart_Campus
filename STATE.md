@@ -52,8 +52,8 @@ The SmartCampus enterprise platform for Lovely Professional University is fully 
 
 | Format | File Path | Description |
 | :--- | :--- | :--- |
-| **PowerPoint (.pptx)** | [`docs/SmartCampus_Presentation.pptx`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Presentation.pptx) | 14-slide widescreen presentation deck formatted in LPU UMS navy & gold with presenter notes, metric cards, role matrices, and lifecycle diagrams. |
+| **PowerPoint (.pptx)** | [`docs/SmartCampus_Presentation.pptx`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Presentation.pptx) | 15-slide human-made capstone presentation deck formatted in LPU UMS navy & gold with student group details (Dipanshu, Vishnu, Harsh), mentor Aryan Chauhan (ID: 35200), syllabus units 1–6 with use cases & code artifacts, challenges tackled, and live workflow demo screenshots. |
 | **Word Document (.docx)** | [`docs/SmartCampus_Project_Report.docx`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Project_Report.docx) | Comprehensive 30+ page university capstone project report formatted in official LPU academic style with 3-student slots, 13 screenshots, and 7 chapters. |
 | **PDF Project Report (.pdf)** | [`docs/SmartCampus_Project_Report.pdf`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Project_Report.pdf) | Exact 32-page publication-grade A4 capstone engineering report with running headers, footers, dynamic page numbers, 13 screenshots, and data tables. |
-| **PDF Presentation Deck (.pdf)** | [`docs/SmartCampus_Presentation.pdf`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Presentation.pdf) | Print- and share-ready 16:9 landscape presentation slide deck in PDF format. |
+| **PDF Presentation Deck (.pdf)** | [`docs/SmartCampus_Presentation.pdf`](file:///c:/Users/hp/Desktop/SmartCampus/docs/SmartCampus_Presentation.pdf) | Print- and share-ready 16:9 landscape presentation slide deck in PDF format matching the 15-slide PPTX. |
 
